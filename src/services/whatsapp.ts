@@ -1,7 +1,7 @@
 import * as fs from 'fs';
 import { ButtonMessageOptions, MenuCategory, MenuItem, MessageButton } from '../../data/types';
-import { headerImageUrls } from '../../data/image';
-import { menuCategories } from '../../data/menuData';
+import { headerImageUrls } from '../data/image';
+import { menuCategories } from '../data/menuData';
 
 const WHATSAPP_TOKEN = process.env.WHATSAPP_TOKEN ?? ""
 const WHATSAPP_API_URL = process.env.WHATSAPP_API_URL ?? ""

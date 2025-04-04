@@ -1,4 +1,4 @@
-import { WhatsAppMessage } from "../../data/types";
+import { WhatsAppMessage } from "../data/types";
 import { createNavigationButtons, getMenuCategory, getMenuItem, sendCategoryMenu, sendHelpMessage, sendItemDetails, sendMainMenu, sendTextMessage, sendWhatsAppRequest } from "../services/whatsapp";
 
 

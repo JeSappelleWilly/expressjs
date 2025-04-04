@@ -1,5 +1,5 @@
 import * as fs from 'fs';
-import { ButtonMessageOptions, MenuCategory, MenuItem, MessageButton } from '../../data/types';
+import { ButtonMessageOptions, MenuCategory, MenuItem, MessageButton } from '../data/types';
 import { headerImageUrls } from '../data/image';
 import { menuCategories } from '../data/menuData';
 

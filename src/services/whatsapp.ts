@@ -1,9 +1,10 @@
 import * as fs from 'fs';
-import { ButtonMessageOptions, MenuCategory, MenuItem, MessageButton } from '../data/types';
-import { headerImageUrls } from '../data/image';
-import { menuCategories } from '../data/menuData';
+import { ButtonMessageOptions, MenuCategory, MenuItem, MessageButton } from '../../data/types';
+import { headerImageUrls } from '../../data/image';
+import { menuCategories } from '../../data/menuData';
 
 const WHATSAPP_TOKEN = process.env.WHATSAPP_TOKEN ?? ""
+const WHATSAPP_PHONE_NUMBER_ID = process.env.WHATSAPP_PHONE_NUMBER_ID ?? "574770619057271"
 const WHATSAPP_API_URL = process.env.WHATSAPP_API_URL ?? ""
 const BASE_IMAGE_URL = process.env.BASE_IMAGE_URL ?? "https://yourserver.com/images" // Replace with your base URL for images
 
@@ -34,8 +35,10 @@ export async function sendWhatsAppRequest(payload: any): Promise<Response> {
   if (!token) {
     throw new Error("WhatsApp API token not found");
   }
+
+  const url = `${WHATSAPP_API_URL}/${WHATSAPP_PHONE_NUMBER_ID}/messages`
   
-  return fetch(WHATSAPP_API_URL, {
+  return fetch(url, {
     method: 'POST',
     headers: {
       'Authorization': `Bearer ${token}`,

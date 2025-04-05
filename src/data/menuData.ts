@@ -1,7 +1,5 @@
 import { MenuCategory, MenuSubcategory, MenuItem } from "./types";
 
-
-
 const menuCategories: Map<string, MenuCategory> = new Map([
   ["popular", { title: "Popular Items", items: new Map() }],
   ["main_menu", { title: "Main Menu", items: new Map() }],
@@ -52,7 +50,19 @@ menuCategories.get("popular")?.items.set("bestsellers", {
   id: "bestsellers",
   title: "Best Sellers",
   description: "Our most popular dishes",
-  items: new Map()
+  items: new Map([
+    ["original_bucket", { // Example: Adding Original Bucket as a bestseller
+      title: "Original Bucket",
+      description: "Classic fried chicken bucket",
+      price: 19.99
+    }],
+    ["chicken_burger", { // Example: Adding Chicken Burger as a bestseller
+      title: "Chicken Burger",
+      description: "Juicy chicken with fresh toppings",
+      price: 8.99
+    }],
+    // Add other best-selling items here
+  ])
 });
 
 // Main Menu items

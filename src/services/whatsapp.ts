@@ -1,5 +1,5 @@
 import * as fs from 'fs';
-import { ButtonMessageOptions, CartItem, CustomerLocation, MenuCategory, MenuItem, MessageButton, Order, Store } from '../data/types';
+import { ButtonMessageOptions, CartItem, CustomerLocation, MenuCategory, MenuItem, MenuSubcategory, MessageButton, Order, Store } from '../data/types';
 import { headerImageUrls } from '../data/image';
 import { menuCategories } from '../data/menuData';
 import { getCart } from './cart';
@@ -11,11 +11,15 @@ const BASE_IMAGE_URL = process.env.BASE_IMAGE_URL ?? "https://yourserver.com/ima
 
 
 
-// These functions are not defined in the original code but referenced
-export function getMenuCategory(categoryId: string): MenuCategory | null {
-  // Implementation would depend on where menu categories are defined
-  return menuCategories.get(categoryId) || null;
+export function getMenuCategory(categoryId: string): MenuSubcategory | null {
+  for (const [, category] of menuCategories) {
+    if (category.items.has(categoryId)) {
+      return category.items.get(categoryId) || null;
+    }
+  }
+  return null;
 }
+
 
 export function getMenuItem(itemId: string): MenuItem | null {
   // Implementation would depend on where menu items are defined
@@ -71,35 +75,35 @@ export async function sendTextMessage(recipient: string, text: string): Promise<
 
 // Create menu payload for WhatsApp API
 export function createMenuPayload(categoryId: string, recipientNumber: string): any | null {
-  const category = getMenuCategory(categoryId);
-  
-  if (!category) {
+  const subcategory = getMenuCategory(categoryId); // Now directly getting the subcategory
+
+  if (!subcategory) {
     return null;
   }
-  
-  const sections: Array<{title: string, rows: Array<{id: string, title: string, description: string}>}> = [];
-  let currentSection = { title: category.title, rows: [] as Array<{id: string, title: string, description: string}> };
-  
+
+  const sections: Array<{ title: string; rows: Array<{ id: string; title: string; description: string }> }> = [];
+  let currentSection = { title: subcategory.title, rows: [] as Array<{ id: string; title: string; description: string }> };
+
   // Convert items to rows format for WhatsApp API
-  for (const [itemId, item] of category.items) {
+  for (const [itemId, item] of subcategory?.items!) {
     currentSection.rows.push({
       id: itemId,
       title: item.title,
-      description: `${item.description} - $${item.price?.toFixed(2) || 'Price varies'}`
+      description: `${item.description} - $${item.price?.toFixed(2) || 'Price varies'}`,
     });
-    
+
     // WhatsApp has a limit of 10 items per section
     if (currentSection.rows.length >= 10) {
       sections.push(currentSection);
-      currentSection = { title: `${category.title} (cont.)`, rows: [] };
+      currentSection = { title: `${subcategory.title} (cont.)`, rows: [] };
     }
   }
-  
+
   // Add remaining items
   if (currentSection.rows.length > 0) {
     sections.push(currentSection);
   }
-  
+
   const payload: any = {
     messaging_product: "whatsapp",
     recipient_type: "individual",
@@ -107,27 +111,23 @@ export function createMenuPayload(categoryId: string, recipientNumber: string): 
     type: "interactive",
     interactive: {
       type: "list",
+      header: {
+        type: "text",
+        text: `🍽️ ${subcategory.title}`, // Use subcategory title
+      },
       body: {
-        text: category.description
+        text: subcategory.description, // Use subcategory description
       },
       footer: {
-        text: "Thank you for choosing us! 🌟"
+        text: "Thank you for choosing us! 🌟",
       },
       action: {
         button: "View Options",
-        sections: sections
-      }
-    }
+        sections: sections,
+      },
+    },
   };
 
-  // Add header with image if available
-
-    // No image specified, use text header
-    payload.interactive.header = {
-      type: "text",
-      text: `🍽️ ${category.title}`
-    };
-  
   return payload;
 }
 

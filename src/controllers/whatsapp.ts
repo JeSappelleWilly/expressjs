@@ -7,7 +7,8 @@ import {
   sendHelpMessage, 
   sendItemDetails, 
   sendMainMenu, 
-  sendTextMessage, 
+  sendTextMessage,
+  sendWelcomeWithButtons,
   sendCartSummary,
   sendPaymentOptions,
   sendOrderConfirmation,
@@ -163,9 +164,11 @@ async function handleIncomingMessage(message: WhatsAppMessage, sender: string): 
   } else if (message.text?.body) {
         // Text message handling
           const text = message.text.body.toLowerCase();
-          
+          if (text === "start") {
+            await sendWelcomeWithButtons(sender)
+          }
           // Basic navigation commands
-          if (text === "start" || text === "menu") {
+          if (text === "menu") {
             await sendMainMenu(sender);
             await setUserState(sender, { flow: "browsing", step: "main_menu" });
             return;

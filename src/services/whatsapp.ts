@@ -676,4 +676,59 @@ function getEstimatedDeliveryTime(sender: string): { min: number, max: number } 
 function getNearbyStores(customerLocation: CustomerLocation | undefined): Store[] | PromiseLike<Store[]> {
   throw new Error('Function not implemented.');
 }
+export async function sendWelcomeWithButtons(recipient: string): Promise<any> {
+  try {
+    const payload = {
+      messaging_product: "whatsapp",
+      recipient_type: "individual",
+      to: recipient,
+      type: "interactive",
+      interactive: {
+        type: "button",
+        header: {
+          type: "text",
+          text: "👋 Welcome to KFC!"
+        },
+        body: {
+          text: "Thank you for connecting with us! We're excited to serve you our delicious menu items. How would you like to proceed?"
+        },
+        footer: {
+          text: "We appreciate your business! 🍗"
+        },
+        action: {
+          buttons: [
+            {
+              type: "reply",
+              reply: {
+                id: "main-menu",
+                title: "Browse Menu"
+              }
+            },
+            {
+              type: "reply",
+              reply: {
+                id: "specials",
+                title: "Today's Specials"
+              }
+            },
+            {
+              type: "reply",
+              reply: {
+                id: "help",
+                title: "Contact Us"
+              }
+            }
+          ]
+        }
+      }
+    };
 
+    const response = await sendWhatsAppRequest(payload);
+    const data = await response.json();
+    console.log('Welcome message with buttons sent:', data);
+    return data;
+  } catch (error) {
+    console.error('Error sending welcome message:', error);
+    throw error;
+  }
+}

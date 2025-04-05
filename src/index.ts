@@ -9,7 +9,33 @@ const port = process.env.PORT || 3333;
 app.use(express.json());
 
 // Redis client initialization
-const redisClient = process.env.REDIS_URL ? new Redis() : new Redis(process.env.REDIS_URL!);
+// Redis client with proper error handling
+let redisClient;
+try {
+  // Use the provided Redis URL if available, otherwise use default
+  const redisUrl = process.env.REDIS_URL || "redis://127.0.0.1:6379";
+  redisClient = new Redis(redisUrl, {
+    maxRetriesPerRequest: 3,
+    retryStrategy(times) {
+      // Retry connection with exponential backoff
+      const delay = Math.min(times * 50, 2000);
+      return delay;
+    }
+  });
+
+  // Add event listeners for Redis connection
+  redisClient.on("error", (err) => {
+    console.error("Redis connection error:", err);
+  });
+
+  redisClient.on("connect", () => {
+    console.log("Successfully connected to Redis");
+  });
+
+} catch (error) {
+  console.error("Error initializing Redis client:", error);
+  process.exit(1);
+}
 
 
 // Constants

@@ -125,24 +125,43 @@ export function createMenuPayload(categoryId: string, recipientNumber: string): 
 }
 
 
-// Function to send the main menu to the user
+// Function to send the main menu to the user with items grouped by category
 export async function sendMainMenu(recipient: string): Promise<any> {
   const sections: Array<{ title: string; rows: Array<{ id: string; title: string; description?: string }> }> = [];
-  const categoryRows: Array<{ id: string; title: string; description?: string }> = [];
-
-  // Add each category as a row in the list
+  
+  // Iterate through each category and its items
   menuCategories.forEach((category, categoryId) => {
-    categoryRows.push({
-      id: categoryId,
-      title: category.title,
-      description: category.description
-    });
+    const categoryRows: Array<{ id: string; title: string; description?: string }> = [];
+    
+    // For each category, go through subcategories and collect items
+    for (const [subcategoryId, subcategory] of category.items) {
+      if (subcategory.items) {
+        // Add each menu item from this subcategory
+        for (const [itemId, item] of subcategory.items) {
+          categoryRows.push({
+            id: itemId,
+            title: item.title,
+            description: `$${item.price.toFixed(2)} - ${item.description}`
+          });
+        }
+      }
+    }
+    
+    // Only add the section if it has items
+    if (categoryRows.length > 0) {
+      sections.push({
+        title: category.title,
+        rows: categoryRows
+      });
+    }
   });
 
-  sections.push({
-    title: "Menu Categories",
-    rows: categoryRows
-  });
+  // WhatsApp has a limit on interactive elements, so we may need to trim
+  // Maximum 10 sections, each with maximum 10 rows
+  const trimmedSections = sections.slice(0, 10).map(section => ({
+    ...section,
+    rows: section.rows.slice(0, 10)
+  }));
 
   const payload: any = {
     messaging_product: "whatsapp",
@@ -153,17 +172,17 @@ export async function sendMainMenu(recipient: string): Promise<any> {
       type: "list",
       header: {
         type: "text",
-        text: "🍽️ Our Menu"
+        text: "🍽️ Our Complete Menu"
       },
       body: {
-        text: "Browse our menu categories:"
+        text: "Browse our menu items organized by category:"
       },
       footer: {
-        text: "Select a category to see more options!"
+        text: "Select an item to see details and order!"
       },
       action: {
         button: "View Menu",
-        sections: sections
+        sections: trimmedSections
       }
     }
   };
@@ -171,10 +190,10 @@ export async function sendMainMenu(recipient: string): Promise<any> {
   try {
     const response = await sendWhatsAppRequest(payload);
     const data = await response.json();
-    console.log("Main menu sent:", data);
+    console.log("Main menu with items sent:", data);
     return data;
   } catch (error) {
-    console.error("Error sending main menu:", error);
+    console.error("Error sending main menu with items:", error);
     throw error;
   }
 }

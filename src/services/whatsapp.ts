@@ -171,8 +171,11 @@ export async function sendMainMenu(recipient: string): Promise<any> {
     interactive: {
       type: "list",
       header: {
-        type: "text",
-        text: "🍽️ Our Complete Menu"
+        "type": "image",
+        "image": {
+          "link": "https://botressources.s3.eu-north-1.amazonaws.com/headers/main.jpg"
+        },
+        caption: "🍽️ Our Complete Menu"
       },
       body: {
         text: "Browse our menu items organized by category:"

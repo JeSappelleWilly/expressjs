@@ -125,55 +125,56 @@ export function createMenuPayload(categoryId: string, recipientNumber: string): 
 }
 
 
+// Function to send the main menu to the user
 export async function sendMainMenu(recipient: string): Promise<any> {
-  try {
-    const sections: Array<{ title: string; rows: Array<{ id: string; title: string; description?: string }> }> = [];
+  const sections: Array<{ title: string; rows: Array<{ id: string; title: string; description?: string }> }> = [];
+  const categoryRows: Array<{ id: string; title: string; description?: string }> = [];
 
-    // Create a section for the main categories
-    const mainCategoryRows: Array<{ id: string; title: string; description?: string }> = [];
-    for (const [categoryKey, category] of menuCategories) {
-      mainCategoryRows.push({
-        id: categoryKey, // Use the top-level category key as the ID
-        title: category.title,
-        description: category.items.size > 0 ? `View our ${category.title} options` : 'Coming soon'
-      });
-    }
-
-    sections.push({
-      title: "Main Menu Categories",
-      rows: mainCategoryRows
+  // Add each category as a row in the list
+  menuCategories.forEach((category, categoryId) => {
+    categoryRows.push({
+      id: categoryId,
+      title: category.title,
+      description: category.description
     });
+  });
 
-    const payload: any = {
-      messaging_product: "whatsapp",
-      recipient_type: "individual",
-      to: recipient,
-      type: "interactive",
-      interactive: {
-        type: "list",
-        header: {
-          type: "text",
-          text: "🍔 KFC Main Menu"
-        },
-        body: {
-          text: "Welcome to our restaurant! Please select a category to view our delicious options:"
-        },
-        footer: {
-          text: "Thank you for choosing us! 🌟"
-        },
-        action: {
-          button: "View Categories",
-          sections: sections
-        }
+  sections.push({
+    title: "Menu Categories",
+    rows: categoryRows
+  });
+
+  const payload: any = {
+    messaging_product: "whatsapp",
+    recipient_type: "individual",
+    to: recipient,
+    type: "interactive",
+    interactive: {
+      type: "list",
+      header: {
+        type: "text",
+        text: "🍽️ Our Menu"
+      },
+      body: {
+        text: "Browse our menu categories:"
+      },
+      footer: {
+        text: "Select a category to see more options!"
+      },
+      action: {
+        button: "View Menu",
+        sections: sections
       }
-    };
+    }
+  };
 
+  try {
     const response = await sendWhatsAppRequest(payload);
     const data = await response.json();
-    console.log('Main menu sent:', data);
+    console.log("Main menu sent:", data);
     return data;
   } catch (error) {
-    console.error('Error sending main menu:', error);
+    console.error("Error sending main menu:", error);
     throw error;
   }
 }

@@ -31,21 +31,8 @@ dailySpecials.items = new Map([
       { id: "spice-level", title: "Spice Level", options: ["Mild", "Medium", "Hot"] },
       { id: "add-protein", title: "Add Protein", options: ["Chicken (+$4)", "Shrimp (+$6)"] }
     ]
-  }],
-  ["special-2", {
-    id: "special-2",
-    title: "Seasonal Risotto",
-    description: "Creamy risotto with locally sourced vegetables",
-    price: 14.99,
-    imageUrl: "https://example.com/images/risotto.jpg"
-  }],
-  ["special-3", {
-    id: "special-3",
-    title: "Catch of the Day",
-    description: "Fresh fish served with chef's choice of sides",
-    price: 22.99,
-    imageUrl: "https://example.com/images/fish.jpg"
   }]
+ 
 ]);
 
 const weeklyDeals: MenuSubcategory = {
@@ -109,13 +96,6 @@ hotAppetizers.items = new Map([
       { id: "wing-sauce", title: "Sauce", options: ["Mild", "Medium", "Hot", "BBQ", "Honey Garlic"] },
       { id: "wing-quantity", title: "Quantity", options: ["6 pieces", "12 pieces (+$6)", "18 pieces (+$12)"] }
     ]
-  }],
-  ["app-3", {
-    id: "app-3",
-    title: "Loaded Potato Skins",
-    description: "Topped with cheese, bacon and green onions",
-    price: 8.99,
-    imageUrl: "https://example.com/images/potato-skins.jpg"
   }]
 ]);
 
@@ -133,20 +113,6 @@ coldAppetizers.items = new Map([
     description: "House-made hummus with vegetables and pita",
     price: 10.99,
     imageUrl: "https://example.com/images/hummus.jpg"
-  }],
-  ["app-5", {
-    id: "app-5",
-    title: "Bruschetta",
-    description: "Toasted bread topped with tomatoes, garlic and basil",
-    price: 7.99,
-    imageUrl: "https://example.com/images/bruschetta.jpg"
-  }],
-  ["app-6", {
-    id: "app-6",
-    title: "Shrimp Cocktail",
-    description: "Chilled jumbo shrimp with cocktail sauce",
-    price: 13.99,
-    imageUrl: "https://example.com/images/shrimp-cocktail.jpg"
   }]
 ]);
 
@@ -187,13 +153,6 @@ pasta.items = new Map([
       { id: "add-chicken", title: "Add Chicken", options: ["Yes (+$4)", "No"] },
       { id: "add-shrimp", title: "Add Shrimp", options: ["Yes (+$6)", "No"] }
     ]
-  }],
-  ["pasta-3", {
-    id: "pasta-3",
-    title: "Penne Arrabbiata",
-    description: "Spicy tomato sauce with garlic and chili",
-    price: 13.99,
-    imageUrl: "https://example.com/images/arrabbiata.jpg"
   }]
 ]);
 
@@ -215,20 +174,6 @@ grill.items = new Map([
       { id: "steak-doneness", title: "Doneness", options: ["Rare", "Medium Rare", "Medium", "Medium Well", "Well Done"] },
       { id: "steak-sides", title: "Side Option", options: ["Mashed Potatoes", "French Fries", "Rice Pilaf", "Seasonal Vegetables"] }
     ]
-  }],
-  ["grill-2", {
-    id: "grill-2",
-    title: "Grilled Salmon",
-    description: "Atlantic salmon with lemon herb butter",
-    price: 21.99,
-    imageUrl: "https://example.com/images/salmon.jpg"
-  }],
-  ["grill-3", {
-    id: "grill-3",
-    title: "BBQ Chicken",
-    description: "Half chicken with house-made BBQ sauce",
-    price: 17.99,
-    imageUrl: "https://example.com/images/bbq-chicken.jpg"
   }]
 ]);
 
@@ -262,20 +207,6 @@ nonAlcoholic.items = new Map([
       { id: "soda-type", title: "Type", options: ["Cola", "Diet Cola", "Lemon-Lime", "Root Beer"] },
       { id: "soda-size", title: "Size", options: ["Small", "Medium (+$0.50)", "Large (+$1)"] }
     ]
-  }],
-  ["bev-2", {
-    id: "bev-2",
-    title: "Fresh Lemonade",
-    description: "Homemade with real lemons",
-    price: 3.99,
-    imageUrl: "https://example.com/images/lemonade.jpg"
-  }],
-  ["bev-3", {
-    id: "bev-3",
-    title: "Iced Tea",
-    description: "Fresh brewed, sweetened or unsweetened",
-    price: 2.99,
-    imageUrl: "https://example.com/images/iced-tea.jpg"
   }]
 ]);
 
@@ -297,20 +228,6 @@ alcoholic.items = new Map([
       { id: "beer-type", title: "Type", options: ["IPA", "Lager", "Stout", "Wheat"] },
       { id: "beer-size", title: "Size", options: ["Pint", "Large (+$2)"] }
     ]
-  }],
-  ["bev-5", {
-    id: "bev-5",
-    title: "House Wine",
-    description: "Red, White, or Rosé",
-    price: 7.99,
-    imageUrl: "https://example.com/images/wine.jpg"
-  }],
-  ["bev-6", {
-    id: "bev-6",
-    title: "Signature Margarita",
-    description: "Premium tequila with fresh lime",
-    price: 9.99,
-    imageUrl: "https://example.com/images/margarita.jpg"
   }]
 ]);
 
@@ -340,20 +257,6 @@ cakes.items = new Map([
     description: "Rich layered cake with chocolate ganache",
     price: 7.99,
     imageUrl: "https://example.com/images/chocolate-cake.jpg"
-  }],
-  ["dessert-2", {
-    id: "dessert-2",
-    title: "Cheesecake",
-    description: "New York style with berry compote",
-    price: 8.99,
-    imageUrl: "https://example.com/images/cheesecake.jpg"
-  }],
-  ["dessert-3", {
-    id: "dessert-3",
-    title: "Apple Pie",
-    description: "Warm pie with vanilla ice cream",
-    price: 6.99,
-    imageUrl: "https://example.com/images/apple-pie.jpg"
   }]
 ]);
 

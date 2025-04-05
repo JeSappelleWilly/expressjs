@@ -158,9 +158,9 @@ export async function sendMainMenu(recipient: string): Promise<any> {
 
   // WhatsApp has a limit on interactive elements, so we may need to trim
   // Maximum 10 sections, each with maximum 10 rows
-  const trimmedSections = sections.slice(0, 10).map(section => ({
+  const trimmedSections = sections.slice(0, 5).map(section => ({
     ...section,
-    rows: section.rows.slice(0, 10)
+    rows: section.rows.slice(0, 5)
   }));
 
   const payload: any = {

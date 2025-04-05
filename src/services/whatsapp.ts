@@ -131,9 +131,6 @@ export function createMenuPayload(categoryId: string, recipientNumber: string): 
 }
 
 
-
-
-// Send main menu
 export async function sendMainMenu(recipient: string): Promise<any> {
   try {
     const sections: Array<{title: string, rows: Array<{id: string, title: string, description: string}>}> = [];
@@ -163,8 +160,12 @@ export async function sendMainMenu(recipient: string): Promise<any> {
       type: "interactive",
       interactive: {
         type: "list",
+        header: {
+            type: "text",
+            text: "🍔 KFC Main Menu"
+        },
         body: {
-          text: "Welcome to our restaurant! Please select a category to view our delicious options:"
+        text: "Welcome to our restaurant! Please select a category to view our delicious options:"
         },
         footer: {
           text: "Thank you for choosing us! 🌟"
@@ -174,22 +175,7 @@ export async function sendMainMenu(recipient: string): Promise<any> {
           sections: sections
         }
       }
-    };
-
-    // Add main menu header image if available
-    if (headerImageUrls["main_menu"]) {
-      payload.interactive.header = {
-        type: "image",
-        image: {
-          link: headerImageUrls["main_menu"]
-        }
-      };
-    } else {
-      payload.interactive.header = {
-        type: "text",
-        text: "🍽️ Restaurant Menu"
-      };
-    }
+    };  
 
     const response = await sendWhatsAppRequest(payload);
     const data = await response.json();

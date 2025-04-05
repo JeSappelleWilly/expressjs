@@ -700,21 +700,21 @@ export async function sendWelcomeWithButtons(recipient: string): Promise<any> {
             {
               type: "reply",
               reply: {
-                id: "view_menu",
+                id: "main-menu",
                 title: "Browse Menu"
               }
             },
             {
               type: "reply",
               reply: {
-                id: "daily_specials",
+                id: "specials",
                 title: "Today's Specials"
               }
             },
             {
               type: "reply",
               reply: {
-                id: "contact_us",
+                id: "help",
                 title: "Contact Us"
               }
             }

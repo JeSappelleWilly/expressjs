@@ -708,7 +708,7 @@ export async function sendWelcomeWithButtons(recipient: string): Promise<any> {
         header: {
           type: "image",
           image: {
-              "link": "https://botressources.s3.eu-north-1.amazonaws.com/headers/main.jpg"
+              "link": "https://unsplash.com/fr/photos/une-personne-coupant-une-pizza-ow8eqdYg19I"
           },
         },
         body: {

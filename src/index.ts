@@ -10,7 +10,7 @@ app.use(express.json());
 
 // Redis client initialization
 // Redis client with proper error handling
-let redisClient;
+let redisClient: Redis;
 try {
   // Use the provided Redis URL if available, otherwise use default
   const redisUrl = process.env.REDIS_URL || "redis://127.0.0.1:6379";

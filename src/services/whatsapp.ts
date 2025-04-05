@@ -120,20 +120,12 @@ export function createMenuPayload(categoryId: string, recipientNumber: string): 
   };
 
   // Add header with image if available
-  if (headerImageUrls[categoryId]) {
-    payload.interactive.header = {
-      type: "image",
-      image: {
-        link: headerImageUrls[categoryId]
-      }
-    };
-  } else {
+
     // No image specified, use text header
     payload.interactive.header = {
       type: "text",
       text: `🍽️ ${category.title}`
     };
-  }
   
   return payload;
 }

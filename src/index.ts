@@ -28,7 +28,6 @@ const processedMessages = new Map();
 async function startServer() {
   try {
     // Connect to Redis
-    await redisClient.connect();
     console.log("Connected to Redis successfully");
     
     // Initialize the state manager with Redis client

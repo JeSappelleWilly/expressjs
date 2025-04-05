@@ -70,6 +70,7 @@ export interface MenuItem {
   }
   
   export interface MenuCategory {
+    id?: string;
     title: string;
     description?: string;
     items: Map<string, MenuSubcategory>;

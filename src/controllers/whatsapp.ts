@@ -94,11 +94,10 @@ async function handleIncomingMessage(message: WhatsAppMessage, sender: string): 
     await sendTextMessage(sender, "To order, please select options from our menu. Type 'menu' to see options.");
     await sendWhatsAppRequest(createNavigationButtons(sender));
   }
-  
-  // Interactive list replies
+  console.warn("interactive", message.interactive?.list_reply)// Interactive list replies
   if (message.interactive?.list_reply) {
     const listReply = message.interactive.list_reply;
-    const selectedKey = listReply.id || getMenuKeyFromTitle(listReply?.title!);
+    const selectedKey = getMenuKeyFromTitle(listReply?.title!);
     console.warn("selected List item Key", selectedKey)
     
     // Check if the selected key is a valid category

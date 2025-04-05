@@ -122,4 +122,16 @@ menuCategories.get("drinks_extras")?.items.set("sides", {
   ])
 });
 
-export { menuCategories };
+function getMenuKeyFromTitle(title: string): string | undefined {
+  const lowerTitle = title.toLowerCase();
+  for (const [, category] of menuCategories) {
+    for (const [subKey, subcategory] of category.items) {
+      if (subcategory.title.toLowerCase() === lowerTitle) {
+        return subKey;
+      }
+    }
+  }
+  return undefined;
+}
+
+export { menuCategories, getMenuKeyFromTitle };

@@ -59,7 +59,6 @@ export interface MenuItem {
     title: string;
     description: string;
     price: number;
-    customizationOptions: any;
   }
   
   export interface MenuSubcategory {

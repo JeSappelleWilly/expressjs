@@ -99,7 +99,7 @@ async function handleIncomingMessage(message: WhatsAppMessage, sender: string): 
   if (message.interactive?.list_reply) {
     const listReply = message.interactive.list_reply;
     const selectedKey = listReply.id || getMenuKeyFromTitle(listReply?.title!);
-    
+    console.warn("selected List item Key", selectedKey)
     
     // Check if the selected key is a valid category
     const category = getMenuCategory(selectedKey!);

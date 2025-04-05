@@ -1,165 +1,438 @@
-import { MenuCategory, MenuSubcategory, MenuItem } from "./types";
+import { MenuCategory, MenuItem, MenuSubcategory } from "../data/types";
 
-const menuCategories: Map<string, MenuCategory> = new Map([
-  ["popular", { title: "Popular Items", items: new Map() }],
-  ["main_menu", { title: "Main Menu", items: new Map() }],
-  ["drinks_extras", { title: "Drinks & Extras", items: new Map() }]
-]);
+/**
+ * Menu data structure with categories, subcategories, and items
+ */
+export const menuCategories: Map<string, MenuCategory> = new Map();
 
-// Populate categories with their respective items
-// Popular Items
-menuCategories.get("popular")?.items.set("specials", {
+// Specials Category
+const specialsCategory: MenuCategory = {
   id: "specials",
   title: "Today's Specials",
-  description: "Check out our chef's special dishes",
-  items: new Map([
-    ["original_bucket", {
-      title: "Original Bucket",
-      description: "Classic fried chicken bucket",
-      price: 19.99
-    }],
-    ["zinger_bucket", {
-      title: "Zinger Bucket",
-      description: "Spicy bucket with crispy chicken",
-      price: 21.99
-    }],
-    ["family_feast", {
-      title: "Family Feast",
-      description: "Meal for sharing with family",
-      price: 29.99
-    }],
-    ["chicken_burger", {
-      title: "Chicken Burger",
-      description: "Juicy chicken with fresh toppings",
-      price: 8.99
-    }],
-    ["crispy_sandwich", {
-      title: "Crispy Sandwich",
-      description: "Crunchy chicken in a soft bun",
-      price: 7.99
-    }],
-    ["mashed_potatoes", {
-      title: "Mashed Potatoes",
-      description: "Creamy, buttery mashed potatoes",
-      price: 3.99
-    }]
-  ])
-});
+  description: "Limited time offers and daily specials",
+  items: new Map()
+};
 
-menuCategories.get("popular")?.items.set("bestsellers", {
-  id: "bestsellers",
-  title: "Best Sellers",
-  description: "Our most popular dishes",
-  items: new Map([
-    ["original_bucket", { // Example: Adding Original Bucket as a bestseller
-      title: "Original Bucket",
-      description: "Classic fried chicken bucket",
-      price: 19.99
-    }],
-    ["chicken_burger", { // Example: Adding Chicken Burger as a bestseller
-      title: "Chicken Burger",
-      description: "Juicy chicken with fresh toppings",
-      price: 8.99
-    }],
-    // Add other best-selling items here
-  ])
-});
+const dailySpecials: MenuSubcategory = {
+  id: "daily-specials",
+  title: "Daily Specials",
+  description: "Fresh dishes available today only",
+  items: new Map()
+};
 
-// Main Menu items
-menuCategories.get("main_menu")?.items.set("appetizers", {
+dailySpecials.items = new Map([
+  ["special-1", {
+    id: "special-1",
+    title: "Chef's Special Pasta",
+    description: "House-made pasta with seasonal ingredients",
+    price: 16.99,
+    imageUrl: "https://example.com/images/chefs-pasta.jpg",
+    customizationOptions: [
+      { id: "spice-level", title: "Spice Level", options: ["Mild", "Medium", "Hot"] },
+      { id: "add-protein", title: "Add Protein", options: ["Chicken (+$4)", "Shrimp (+$6)"] }
+    ]
+  }],
+  ["special-2", {
+    id: "special-2",
+    title: "Seasonal Risotto",
+    description: "Creamy risotto with locally sourced vegetables",
+    price: 14.99,
+    imageUrl: "https://example.com/images/risotto.jpg"
+  }],
+  ["special-3", {
+    id: "special-3",
+    title: "Catch of the Day",
+    description: "Fresh fish served with chef's choice of sides",
+    price: 22.99,
+    imageUrl: "https://example.com/images/fish.jpg"
+  }]
+]);
+
+const weeklyDeals: MenuSubcategory = {
+  id: "weekly-deals",
+  title: "Weekly Deals",
+  description: "Special offers valid this week",
+  items: new Map()
+};
+
+weeklyDeals.items = new Map([
+  ["deal-1", {
+    id: "deal-1",
+    title: "Family Bundle",
+    description: "Feeds 4: Includes 1 large pizza, 4 sides, and 2L drink",
+    price: 39.99,
+    imageUrl: "https://example.com/images/family-bundle.jpg"
+  }],
+  ["deal-2", {
+    id: "deal-2",
+    title: "Lunch Special",
+    description: "Main course + soup or salad (Available 11am-3pm)",
+    price: 12.99,
+    imageUrl: "https://example.com/images/lunch-special.jpg"
+  }]
+]);
+
+specialsCategory.items.set("daily-specials", dailySpecials);
+specialsCategory.items.set("weekly-deals", weeklyDeals);
+menuCategories.set("specials", specialsCategory);
+
+// Appetizers Category
+const appetizersCategory: MenuCategory = {
   id: "appetizers",
   title: "Appetizers",
   description: "Starters and small plates",
   items: new Map()
-  // Add appetizer items here
-});
+};
 
-menuCategories.get("main_menu")?.items.set("main_courses", {
-  id: "main_courses",
-  title: "Main Courses",
-  description: "Signature dishes and entrees",
-  items: new Map([
-    ["classic_chicken", {
-      title: "Classic Chicken",
-      description: "Crispy, seasoned chicken served with your choice of sides.",
-      price: 12.99
-    }],
-    ["spicy_chicken", {
-      title: "Spicy Chicken",
-      description: "For those who love a little heat with their crunch.",
-      price: 13.99
-    }]
-  ])
-});
-
-menuCategories.get("main_menu")?.items.set("desserts", {
-  id: "desserts",
-  title: "Desserts",
-  description: "Sweet treats to finish",
+const hotAppetizers: MenuSubcategory = {
+  id: "hot-appetizers",
+  title: "Hot Appetizers",
+  description: "Warm starters to begin your meal",
   items: new Map()
-  // Add dessert items here
-});
+};
 
-// Drinks & Extras
-menuCategories.get("drinks_extras")?.items.set("beverages", {
+hotAppetizers.items = new Map([
+  ["app-1", {
+    id: "app-1",
+    title: "Spinach & Artichoke Dip",
+    description: "Creamy dip with warm tortilla chips",
+    price: 9.99,
+    imageUrl: "https://example.com/images/spinach-dip.jpg"
+  }],
+  ["app-2", {
+    id: "app-2",
+    title: "Buffalo Wings",
+    description: "Crispy wings with choice of sauce",
+    price: 12.99,
+    imageUrl: "https://example.com/images/wings.jpg",
+    customizationOptions: [
+      { id: "wing-sauce", title: "Sauce", options: ["Mild", "Medium", "Hot", "BBQ", "Honey Garlic"] },
+      { id: "wing-quantity", title: "Quantity", options: ["6 pieces", "12 pieces (+$6)", "18 pieces (+$12)"] }
+    ]
+  }],
+  ["app-3", {
+    id: "app-3",
+    title: "Loaded Potato Skins",
+    description: "Topped with cheese, bacon and green onions",
+    price: 8.99,
+    imageUrl: "https://example.com/images/potato-skins.jpg"
+  }]
+]);
+
+const coldAppetizers: MenuSubcategory = {
+  id: "cold-appetizers",
+  title: "Cold Appetizers",
+  description: "Refreshing starters and shareable plates",
+  items: new Map()
+};
+
+coldAppetizers.items = new Map([
+  ["app-4", {
+    id: "app-4",
+    title: "Hummus Platter",
+    description: "House-made hummus with vegetables and pita",
+    price: 10.99,
+    imageUrl: "https://example.com/images/hummus.jpg"
+  }],
+  ["app-5", {
+    id: "app-5",
+    title: "Bruschetta",
+    description: "Toasted bread topped with tomatoes, garlic and basil",
+    price: 7.99,
+    imageUrl: "https://example.com/images/bruschetta.jpg"
+  }],
+  ["app-6", {
+    id: "app-6",
+    title: "Shrimp Cocktail",
+    description: "Chilled jumbo shrimp with cocktail sauce",
+    price: 13.99,
+    imageUrl: "https://example.com/images/shrimp-cocktail.jpg"
+  }]
+]);
+
+appetizersCategory.items.set("hot-appetizers", hotAppetizers);
+appetizersCategory.items.set("cold-appetizers", coldAppetizers);
+menuCategories.set("appetizers", appetizersCategory);
+
+// Main Courses Category
+const mainsCategory: MenuCategory = {
+  id: "mains",
+  title: "Main Courses",
+  description: "Hearty entrees and signature dishes",
+  items: new Map()
+};
+
+const pasta: MenuSubcategory = {
+  id: "pasta",
+  title: "Pasta Dishes",
+  description: "Fresh pasta with house-made sauces",
+  items: new Map()
+};
+
+pasta.items = new Map([
+  ["pasta-1", {
+    id: "pasta-1",
+    title: "Spaghetti Bolognese",
+    description: "Classic meat sauce with parmesan",
+    price: 15.99,
+    imageUrl: "https://example.com/images/bolognese.jpg"
+  }],
+  ["pasta-2", {
+    id: "pasta-2",
+    title: "Fettuccine Alfredo",
+    description: "Creamy parmesan sauce",
+    price: 14.99,
+    imageUrl: "https://example.com/images/alfredo.jpg",
+    customizationOptions: [
+      { id: "add-chicken", title: "Add Chicken", options: ["Yes (+$4)", "No"] },
+      { id: "add-shrimp", title: "Add Shrimp", options: ["Yes (+$6)", "No"] }
+    ]
+  }],
+  ["pasta-3", {
+    id: "pasta-3",
+    title: "Penne Arrabbiata",
+    description: "Spicy tomato sauce with garlic and chili",
+    price: 13.99,
+    imageUrl: "https://example.com/images/arrabbiata.jpg"
+  }]
+]);
+
+const grill: MenuSubcategory = {
+  id: "grill",
+  title: "From the Grill",
+  description: "Perfectly grilled meats and seafood",
+  items: new Map()
+};
+
+grill.items = new Map([
+  ["grill-1", {
+    id: "grill-1",
+    title: "Ribeye Steak",
+    description: "12oz aged beef with roasted vegetables",
+    price: 28.99,
+    imageUrl: "https://example.com/images/ribeye.jpg",
+    customizationOptions: [
+      { id: "steak-doneness", title: "Doneness", options: ["Rare", "Medium Rare", "Medium", "Medium Well", "Well Done"] },
+      { id: "steak-sides", title: "Side Option", options: ["Mashed Potatoes", "French Fries", "Rice Pilaf", "Seasonal Vegetables"] }
+    ]
+  }],
+  ["grill-2", {
+    id: "grill-2",
+    title: "Grilled Salmon",
+    description: "Atlantic salmon with lemon herb butter",
+    price: 21.99,
+    imageUrl: "https://example.com/images/salmon.jpg"
+  }],
+  ["grill-3", {
+    id: "grill-3",
+    title: "BBQ Chicken",
+    description: "Half chicken with house-made BBQ sauce",
+    price: 17.99,
+    imageUrl: "https://example.com/images/bbq-chicken.jpg"
+  }]
+]);
+
+mainsCategory.items.set("pasta", pasta);
+mainsCategory.items.set("grill", grill);
+menuCategories.set("mains", mainsCategory);
+
+// Beverages Category
+const beveragesCategory: MenuCategory = {
   id: "beverages",
   title: "Beverages",
-  description: "Soft drinks, coffee, and tea",
+  description: "Refreshing drinks and cocktails",
   items: new Map()
-  // Add beverage items here
-});
+};
 
-menuCategories.get("drinks_extras")?.items.set("sides", {
-  id: "sides",
-  title: "Side Orders",
-  description: "Extra additions to your meal",
-  items: new Map([
-    ["crispy_fries", {
-      title: "Crispy Fries",
-      description: "Golden fries seasoned to perfection.",
-      price: 2.99
-    }],
-    ["coleslaw", {
-      title: "Coleslaw",
-      description: "Fresh and tangy coleslaw to complement your meal.",
-      price: 2.49
-    }],
-    ["buttermilk_biscuits", {
-      title: "Buttermilk Biscuits",
-      description: "Fluffy biscuits, a perfect side to your chicken.",
-      price: 1.99
-    }]
-  ])
-});
+const nonAlcoholic: MenuSubcategory = {
+  id: "non-alcoholic",
+  title: "Non-Alcoholic Drinks",
+  description: "Sodas, juices, and more",
+  items: new Map()
+};
 
-function getMenuKeyFromTitle(title: string): string | undefined {
-  const lowerTitle = title.toLowerCase();
+nonAlcoholic.items = new Map([
+  ["bev-1", {
+    id: "bev-1",
+    title: "Soft Drinks",
+    description: "Cola, Diet Cola, Lemon-Lime, Root Beer",
+    price: 2.99,
+    imageUrl: "https://example.com/images/soda.jpg",
+    customizationOptions: [
+      { id: "soda-type", title: "Type", options: ["Cola", "Diet Cola", "Lemon-Lime", "Root Beer"] },
+      { id: "soda-size", title: "Size", options: ["Small", "Medium (+$0.50)", "Large (+$1)"] }
+    ]
+  }],
+  ["bev-2", {
+    id: "bev-2",
+    title: "Fresh Lemonade",
+    description: "Homemade with real lemons",
+    price: 3.99,
+    imageUrl: "https://example.com/images/lemonade.jpg"
+  }],
+  ["bev-3", {
+    id: "bev-3",
+    title: "Iced Tea",
+    description: "Fresh brewed, sweetened or unsweetened",
+    price: 2.99,
+    imageUrl: "https://example.com/images/iced-tea.jpg"
+  }]
+]);
+
+const alcoholic: MenuSubcategory = {
+  id: "alcoholic",
+  title: "Alcoholic Beverages",
+  description: "Beer, wine, and cocktails",
+  items: new Map()
+};
+
+alcoholic.items = new Map([
+  ["bev-4", {
+    id: "bev-4",
+    title: "Draft Beer",
+    description: "Selection of local and imported beers",
+    price: 5.99,
+    imageUrl: "https://example.com/images/beer.jpg",
+    customizationOptions: [
+      { id: "beer-type", title: "Type", options: ["IPA", "Lager", "Stout", "Wheat"] },
+      { id: "beer-size", title: "Size", options: ["Pint", "Large (+$2)"] }
+    ]
+  }],
+  ["bev-5", {
+    id: "bev-5",
+    title: "House Wine",
+    description: "Red, White, or Rosé",
+    price: 7.99,
+    imageUrl: "https://example.com/images/wine.jpg"
+  }],
+  ["bev-6", {
+    id: "bev-6",
+    title: "Signature Margarita",
+    description: "Premium tequila with fresh lime",
+    price: 9.99,
+    imageUrl: "https://example.com/images/margarita.jpg"
+  }]
+]);
+
+beveragesCategory.items.set("non-alcoholic", nonAlcoholic);
+beveragesCategory.items.set("alcoholic", alcoholic);
+menuCategories.set("beverages", beveragesCategory);
+
+// Desserts Category
+const dessertsCategory: MenuCategory = {
+  id: "desserts",
+  title: "Desserts",
+  description: "Sweet treats to end your meal",
+  items: new Map()
+};
+
+const cakes: MenuSubcategory = {
+  id: "cakes",
+  title: "Cakes & Pies",
+  description: "House-made desserts",
+  items: new Map()
+};
+
+cakes.items = new Map([
+  ["dessert-1", {
+    id: "dessert-1",
+    title: "Chocolate Cake",
+    description: "Rich layered cake with chocolate ganache",
+    price: 7.99,
+    imageUrl: "https://example.com/images/chocolate-cake.jpg"
+  }],
+  ["dessert-2", {
+    id: "dessert-2",
+    title: "Cheesecake",
+    description: "New York style with berry compote",
+    price: 8.99,
+    imageUrl: "https://example.com/images/cheesecake.jpg"
+  }],
+  ["dessert-3", {
+    id: "dessert-3",
+    title: "Apple Pie",
+    description: "Warm pie with vanilla ice cream",
+    price: 6.99,
+    imageUrl: "https://example.com/images/apple-pie.jpg"
+  }]
+]);
+
+const iceCream: MenuSubcategory = {
+  id: "ice-cream",
+  title: "Ice Cream & Frozen Treats",
+  description: "Cold and creamy desserts",
+  items: new Map()
+};
+
+iceCream.items = new Map([
+  ["dessert-4", {
+    id: "dessert-4",
+    title: "Ice Cream Sundae",
+    description: "Three scoops with toppings and whipped cream",
+    price: 6.99,
+    imageUrl: "https://example.com/images/sundae.jpg",
+    customizationOptions: [
+      { id: "ice-cream-flavor", title: "Flavors", options: ["Vanilla", "Chocolate", "Strawberry", "Mint Chip"] },
+      { id: "ice-cream-toppings", title: "Toppings", options: ["Hot Fudge", "Caramel", "Strawberry", "Nuts"] }
+    ]
+  }],
+  ["dessert-5", {
+    id: "dessert-5",
+    title: "Milkshake",
+    description: "Thick and creamy, topped with whipped cream",
+    price: 5.99,
+    imageUrl: "https://example.com/images/milkshake.jpg"
+  }]
+]);
+
+dessertsCategory.items.set("cakes", cakes);
+dessertsCategory.items.set("ice-cream", iceCream);
+menuCategories.set("desserts", dessertsCategory);
+
+/**
+ * Helper function to get a menu category by ID
+ */
+export function getMenuCategory(categoryId: string): MenuCategory | undefined {
+  return menuCategories.get(categoryId);
+}
+
+/**
+ * Helper function to get a menu item by ID
+ */
+export function getMenuItem(itemId: string): MenuItem | undefined {
   for (const [, category] of menuCategories) {
-    for (const [subKey, subcategory] of category.items) {
-      if (subcategory.title.toLowerCase() === lowerTitle) {
-        return subKey;
+    for (const [, subcategory] of category.items) {
+      const item = subcategory.items?.get(itemId);
+      if (item) {
+        return item;
       }
     }
   }
   return undefined;
 }
 
-function getCategoryKeyFromTitle(title: string): string | null {
-  const lowerTitle = title.toLowerCase();
-
-  // Check top-level categories
-  for (const [key, category] of menuCategories.entries()) {
-    if (category.title.toLowerCase() === lowerTitle) {
+/**
+ * Helper function to get a category key from its title
+ */
+export function getCategoryKeyFromTitle(title: string): string | undefined {
+  for (const [key, category] of menuCategories) {
+    if (category.title.toLowerCase() === title.toLowerCase()) {
       return key;
     }
-    // Check subcategories within each category
-    for (const [subKey, subcategory] of category.items.entries()) {
-      if (subcategory.title.toLowerCase() === lowerTitle) {
-        return subKey;
+  }
+  return undefined;
+}
+
+/**
+ * Helper function to get a menu key from its title
+ */
+export function getMenuKeyFromTitle(title: string): string | undefined {
+  for (const [, category] of menuCategories) {
+    for (const [key, subcategory] of category.items) {
+      if (subcategory.title.toLowerCase() === title.toLowerCase()) {
+        return key;
       }
     }
   }
-  return null;
+  return undefined;
 }
-
-export { menuCategories, getMenuKeyFromTitle, getCategoryKeyFromTitle };

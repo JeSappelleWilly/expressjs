@@ -9,7 +9,7 @@ const menuCategories: Map<string, MenuCategory> = new Map([
 // Populate categories with their respective items
 // Popular Items
 menuCategories.get("popular")?.items.set("specials", {
-  id: "specials",
+  id: "specials", // Explicit ID
   title: "Today's Specials",
   description: "Check out our chef's special dishes",
   items: new Map([
@@ -47,7 +47,7 @@ menuCategories.get("popular")?.items.set("specials", {
 });
 
 menuCategories.get("popular")?.items.set("bestsellers", {
-  id: "bestsellers",
+  id: "bestsellers", // Explicit ID
   title: "Best Sellers",
   description: "Our most popular dishes",
   items: new Map([
@@ -67,7 +67,7 @@ menuCategories.get("popular")?.items.set("bestsellers", {
 
 // Main Menu items
 menuCategories.get("main_menu")?.items.set("appetizers", {
-  id: "appetizers",
+  id: "appetizers", // Explicit ID
   title: "Appetizers",
   description: "Starters and small plates",
   items: new Map()
@@ -75,7 +75,7 @@ menuCategories.get("main_menu")?.items.set("appetizers", {
 });
 
 menuCategories.get("main_menu")?.items.set("main_courses", {
-  id: "main_courses",
+  id: "main_courses", // Explicit ID
   title: "Main Courses",
   description: "Signature dishes and entrees",
   items: new Map([
@@ -93,7 +93,7 @@ menuCategories.get("main_menu")?.items.set("main_courses", {
 });
 
 menuCategories.get("main_menu")?.items.set("desserts", {
-  id: "desserts",
+  id: "desserts", // Explicit ID
   title: "Desserts",
   description: "Sweet treats to finish",
   items: new Map()
@@ -102,7 +102,7 @@ menuCategories.get("main_menu")?.items.set("desserts", {
 
 // Drinks & Extras
 menuCategories.get("drinks_extras")?.items.set("beverages", {
-  id: "beverages",
+  id: "beverages", // Explicit ID
   title: "Beverages",
   description: "Soft drinks, coffee, and tea",
   items: new Map()
@@ -110,7 +110,7 @@ menuCategories.get("drinks_extras")?.items.set("beverages", {
 });
 
 menuCategories.get("drinks_extras")?.items.set("sides", {
-  id: "sides",
+  id: "sides", // Explicit ID
   title: "Side Orders",
   description: "Extra additions to your meal",
   items: new Map([

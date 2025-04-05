@@ -171,11 +171,8 @@ export async function sendMainMenu(recipient: string): Promise<any> {
     interactive: {
       type: "list",
       header: {
-        "type": "image",
-        "image": {
-          "link": "https://botressources.s3.eu-north-1.amazonaws.com/headers/main.jpg"
-        },
-        caption: "🍽️ Our Complete Menu"
+        type: "text",
+        text: "🍽️ Our Complete Menu"
       },
       body: {
         text: "Browse our menu items organized by category:"
@@ -709,8 +706,10 @@ export async function sendWelcomeWithButtons(recipient: string): Promise<any> {
       interactive: {
         type: "button",
         header: {
-          type: "text",
-          text: "👋 Welcome to KFC!"
+          type: "image",
+          image: {
+              "link": "https://botressources.s3.eu-north-1.amazonaws.com/headers/main.jpg"
+          },
         },
         body: {
           text: "Thank you for connecting with us! We're excited to serve you our delicious menu items. How would you like to proceed?"

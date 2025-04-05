@@ -1,7 +1,8 @@
 import * as fs from 'fs';
-import { ButtonMessageOptions, MenuCategory, MenuItem, MessageButton } from '../data/types';
+import { ButtonMessageOptions, CartItem, CustomerLocation, MenuCategory, MenuItem, MessageButton, Order, Store } from '../data/types';
 import { headerImageUrls } from '../data/image';
 import { menuCategories } from '../data/menuData';
+import { getCart } from './cart';
 
 const WHATSAPP_TOKEN = process.env.WHATSAPP_TOKEN ?? ""
 const WHATSAPP_PHONE_NUMBER_ID = process.env.WHATSAPP_PHONE_NUMBER_ID ?? "574770619057271"
@@ -672,76 +673,6 @@ export async function sendPaymentOptions(recipient: string): Promise<any> {
     throw error;
   }
 }
-// Create menu payload for WhatsApp API
-export function createMenuPayload(categoryId: string, recipientNumber: string): any | null {
-  const category = getMenuCategory(categoryId);
-  
-  if (!category) {
-    return null;
-  }
-  
-  const sections: Array<{title: string, rows: Array<{id: string, title: string, description: string}>}> = [];
-  let currentSection = { title: category.title, rows: [] as Array<{id: string, title: string, description: string}> };
-  
-  // Convert items to rows format for WhatsApp API
-  for (const [itemId, item] of category.items) {
-    currentSection.rows.push({
-      id: itemId,
-      title: item.title,
-      description: `${item.description} - $${item.price?.toFixed(2) || 'Price varies'}`
-    });
-    
-    // WhatsApp has a limit of 10 items per section
-    if (currentSection.rows.length >= 10) {
-      sections.push(currentSection);
-      currentSection = { title: `${category.title} (cont.)`, rows: [] };
-    }
-  }
-  
-  // Add remaining items
-  if (currentSection.rows.length > 0) {
-    sections.push(currentSection);
-  }
-  
-  const payload: any = {
-    messaging_product: "whatsapp",
-    recipient_type: "individual",
-    to: recipientNumber,
-    type: "interactive",
-    interactive: {
-      type: "list",
-      body: {
-        text: category.description
-      },
-      footer: {
-        text: "Thank you for choosing us! 🌟"
-      },
-      action: {
-        button: "View Options",
-        sections: sections
-      }
-    }
-  };
-
-  // Add header with image if available
-  if (headerImageUrls[categoryId]) {
-    payload.interactive.header = {
-      type: "image",
-      image: {
-        link: headerImageUrls[categoryId]
-      }
-    };
-  } else {
-    // No image specified, use text header
-    payload.interactive.header = {
-      type: "text",
-      text: `🍽️ ${category.title}`
-    };
-  }
-  
-  return payload;
-}
-
 
 // Get estimated delivery time
 function getEstimatedDeliveryTime(sender: string): { min: number, max: number } {
@@ -755,5 +686,4 @@ function getEstimatedDeliveryTime(sender: string): { min: number, max: number } 
 function getNearbyStores(customerLocation: CustomerLocation | undefined): Store[] | PromiseLike<Store[]> {
   throw new Error('Function not implemented.');
 }
-
 

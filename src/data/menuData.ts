@@ -49,13 +49,6 @@ weeklyDeals.items = new Map([
     description: "Feeds 4: Includes 1 large pizza, 4 sides, and 2L drink",
     price: 39.99,
     imageUrl: "https://example.com/images/family-bundle.jpg"
-  }],
-  ["deal-2", {
-    id: "deal-2",
-    title: "Lunch Special",
-    description: "Main course + soup or salad (Available 11am-3pm)",
-    price: 12.99,
-    imageUrl: "https://example.com/images/lunch-special.jpg"
   }]
 ]);
 
@@ -85,17 +78,6 @@ hotAppetizers.items = new Map([
     description: "Creamy dip with warm tortilla chips",
     price: 9.99,
     imageUrl: "https://example.com/images/spinach-dip.jpg"
-  }],
-  ["app-2", {
-    id: "app-2",
-    title: "Buffalo Wings",
-    description: "Crispy wings with choice of sauce",
-    price: 12.99,
-    imageUrl: "https://example.com/images/wings.jpg",
-    customizationOptions: [
-      { id: "wing-sauce", title: "Sauce", options: ["Mild", "Medium", "Hot", "BBQ", "Honey Garlic"] },
-      { id: "wing-quantity", title: "Quantity", options: ["6 pieces", "12 pieces (+$6)", "18 pieces (+$12)"] }
-    ]
   }]
 ]);
 
@@ -142,17 +124,6 @@ pasta.items = new Map([
     description: "Classic meat sauce with parmesan",
     price: 15.99,
     imageUrl: "https://example.com/images/bolognese.jpg"
-  }],
-  ["pasta-2", {
-    id: "pasta-2",
-    title: "Fettuccine Alfredo",
-    description: "Creamy parmesan sauce",
-    price: 14.99,
-    imageUrl: "https://example.com/images/alfredo.jpg",
-    customizationOptions: [
-      { id: "add-chicken", title: "Add Chicken", options: ["Yes (+$4)", "No"] },
-      { id: "add-shrimp", title: "Add Shrimp", options: ["Yes (+$6)", "No"] }
-    ]
   }]
 ]);
 
@@ -278,13 +249,6 @@ iceCream.items = new Map([
       { id: "ice-cream-flavor", title: "Flavors", options: ["Vanilla", "Chocolate", "Strawberry", "Mint Chip"] },
       { id: "ice-cream-toppings", title: "Toppings", options: ["Hot Fudge", "Caramel", "Strawberry", "Nuts"] }
     ]
-  }],
-  ["dessert-5", {
-    id: "dessert-5",
-    title: "Milkshake",
-    description: "Thick and creamy, topped with whipped cream",
-    price: 5.99,
-    imageUrl: "https://example.com/images/milkshake.jpg"
   }]
 ]);
 

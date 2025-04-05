@@ -17,7 +17,7 @@ import {
 } from "../services/whatsapp";
 
 import { addItemToCart, getCart, removeFromCart } from "../services/cart";
-import { getMenuKeyFromTitle } from "../data/menuData";
+import { getCategoryKeyFromTitle, getMenuKeyFromTitle } from "../data/menuData";
 
 
 
@@ -98,22 +98,24 @@ async function handleIncomingMessage(message: WhatsAppMessage, sender: string): 
   if (message.interactive?.list_reply) {
     const listReply = message.interactive.list_reply;
     const selectedKey = getMenuKeyFromTitle(listReply?.title!);
+    const catId = listReply?.id;
+
     console.warn("selected List item Key", selectedKey)
     
     // Check if the selected key is a valid category
-    const category = getMenuCategory(selectedKey!);
+    const category = getCategoryKeyFromTitle(selectedKey!);
     if (category) {
-      await sendCategoryMenu(sender, selectedKey!);
-      await setUserState(sender, { flow: "browsing", step: "category", currentCategory: selectedKey });
+      await sendCategoryMenu(sender, catId!);
+      await setUserState(sender, { flow: "browsing", step: "category", currentCategory: catId });
       return;
     }
     
       // Check if it's a menu item
     // Check if it's a menu item
-    const menuItem = getMenuItem(selectedKey!);
+    const menuItem = getMenuItem(catId!);
     if (menuItem) {
-      await sendItemDetails(sender, selectedKey!);
-      await setUserState(sender, { flow: "browsing", step: "item_detail", currentItemId: selectedKey });
+      await sendItemDetails(sender, catId!);
+      await setUserState(sender, { flow: "browsing", step: "item_detail", currentItemId: catId });
       return;
     }
     

@@ -221,10 +221,6 @@ async function handleIncomingMessage(message: WhatsAppMessage, sender: string): 
             await addSpecialInstructions(sender, message.text.body, userState.currentItemId);
             return;
           }
-          
-          // Default text response
-          await sendTextMessage(sender, "To order, please select options from our menu. Type 'menu' to see options.");
-          await sendWhatsAppRequest(createNavigationButtons(sender));
         
     return;
   } else if (message.location) {

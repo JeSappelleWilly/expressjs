@@ -17,7 +17,7 @@ import {
 } from "../services/whatsapp";
 
 import { addItemToCart, getCart, removeFromCart } from "../services/cart";
-import { getCategoryKeyFromTitle, getMenuKeyFromTitle } from "../data/menuData";
+import { getCategoryKeyFromTitle, getMenuKeyFromTitle, menuCategories } from "../data/menuData";
 
 
 
@@ -35,12 +35,24 @@ async function handleIncomingMessage(message: WhatsAppMessage, sender: string): 
   console.warn("interactive", message.interactive?.list_reply)// Interactive list replies
   if (message.interactive?.list_reply) {
     const listReply = message.interactive.list_reply;
-    const selectedCategoryId = listReply.id; // This will now be the top-level category key
-    console.warn("Selected Category ID from Main Menu:", selectedCategoryId);
 
-    // Now, send the sub-menu for this category
-    await sendCategoryMenu(sender, selectedCategoryId!);
-    await setUserState(sender, { flow: "browsing", step: "category", currentCategory: selectedCategoryId });
+    // Check if this is a selection from the main category menu
+    const selectedCategoryId = Object.keys(menuCategories).find(key => key === listReply.id);
+    if (selectedCategoryId) {
+      console.warn("Selected Category ID from Main Menu:", selectedCategoryId);
+      await sendCategoryMenu(sender, selectedCategoryId);
+      await setUserState(sender, { flow: "browsing", step: "category", currentCategory: selectedCategoryId });
+      return;
+    }
+
+    // If not a top-level category, assume it's a subcategory selection
+    const selectedSubcategoryId = listReply.id;
+    console.warn("Selected Subcategory ID:", selectedSubcategoryId);
+
+    // Now, fetch and display the items for this subcategory
+    await sendItemList(sender, selectedSubcategoryId!); // You'll need to create this function
+    await setUserState(sender, { flow: "browsing", step: "item_list", currentSubcategory: selectedSubcategoryId });
+    return;
     return;
   } else if (message.interactive?.button_reply) {
       const buttonId = message.interactive.button_reply.id;
@@ -222,6 +234,67 @@ async function handleIncomingMessage(message: WhatsAppMessage, sender: string): 
   }
 
 
+}
+
+export async function sendItemList(recipient: string, subcategoryId: string): Promise<any | void> {
+  for (const [, category] of menuCategories) {
+    const subcategory = category.items.get(subcategoryId);
+    if (subcategory) {
+      const sections: Array<{ title: string; rows: Array<{ id: string; title: string; description?: string }> }> = [];
+      const itemRows: Array<{ id: string; title: string; description?: string }> = [];
+
+      for (const [itemId, item] of subcategory.items!) {
+        itemRows.push({
+          id: itemId,
+          title: item.title,
+          description: `${item.description} - $${item.price?.toFixed(2) || 'Price varies'}`
+        });
+      }
+
+      sections.push({
+        title: subcategory.title,
+        rows: itemRows
+      });
+
+      const payload: any = {
+        messaging_product: "whatsapp",
+        recipient_type: "individual",
+        to: recipient,
+        type: "interactive",
+        interactive: {
+          type: "list",
+          header: {
+            type: "text",
+            text: `🍽️ ${subcategory.title}`
+          },
+          body: {
+            text: `Select an item from our ${subcategory.title} menu:`
+          },
+          footer: {
+            text: "View item details for more info! 🌟"
+          },
+          action: {
+            button: `View ${subcategory.title} Items`,
+            sections: sections
+          }
+        }
+      };
+
+
+      try {
+        const response = await sendWhatsAppRequest(payload);
+        const data = await response.json();
+        console.log(`${subcategory.title} items sent:`, data);
+        return data;
+      } catch (error) {
+        console.error(`Error sending ${subcategory.title} items:`, error);
+        throw error;
+      }
+    }
+  }
+
+  await sendTextMessage(recipient, "Sorry, those items are not currently available.");
+  await sendWhatsAppRequest(createNavigationButtons(recipient));
 }
 
 /**

@@ -1,9 +1,65 @@
+export interface Cart {
+  id?: string;
+  items: CartItem[];
+  totalAmount: number
+}
+
+
+export interface CartItem {
+  id?: string;
+  item: MenuItem;
+
+    name: string;
+    description: string;
+    price: number;
+    quantity: number;
+    customizations: [];
+    specialInstructions: string
+}
+
+
+export interface Store {
+  id?: string;
+  name: string;
+  phone: string;
+  hours: string;
+  distance: number;
+  address: {}
+}
+
+export interface CustomerLocation {
+  id?: string;
+  name?: string;
+  address?: {}
+  longitude: number;
+  latitude: number;
+}
+
+
+
+export interface Order {
+  id?: string;
+  items: CartItem[];
+  notes: string;
+  totalAmount: number;
+  discount: number;
+  tax: number;
+  subtotal: number;
+  total: number;
+  type:string;
+  store: Store;
+  estimatedTime: number;
+  deliveryAddress: {}
+  paymentMethod: string
+}
+
 
 export interface MenuItem {
     id?: string;
     title: string;
     description: string;
     price: number;
+    customizationOptions: any;
   }
   
   export interface MenuSubcategory {
@@ -47,7 +103,9 @@ export interface MenuItem {
     };
     interactive?: {
       list_reply?: {
-        id: string;
+        id?: string;
+        title?: string;
+        description?: string
       };
       button_reply?: {
         id: string;

@@ -127,9 +127,6 @@ function getMenuKeyFromTitle(title: string): string | undefined {
   for (const [, category] of menuCategories) {
     for (const [subKey, subcategory] of category.items) {
       if (subcategory.title.toLowerCase() === lowerTitle) {
-        console.warn("subcategory", subcategory)
-        console.warn("lowerTitle", lowerTitle)
-
         return subKey;
       }
     }
@@ -137,4 +134,22 @@ function getMenuKeyFromTitle(title: string): string | undefined {
   return undefined;
 }
 
-export { menuCategories, getMenuKeyFromTitle };
+function getCategoryKeyFromTitle(title: string): string | null {
+  const lowerTitle = title.toLowerCase();
+
+  // Check top-level categories
+  for (const [key, category] of menuCategories.entries()) {
+    if (category.title.toLowerCase() === lowerTitle) {
+      return key;
+    }
+    // Check subcategories within each category
+    for (const [subKey, subcategory] of category.items.entries()) {
+      if (subcategory.title.toLowerCase() === lowerTitle) {
+        return subKey;
+      }
+    }
+  }
+  return null;
+}
+
+export { menuCategories, getMenuKeyFromTitle, getCategoryKeyFromTitle };

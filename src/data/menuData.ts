@@ -127,6 +127,9 @@ function getMenuKeyFromTitle(title: string): string | undefined {
   for (const [, category] of menuCategories) {
     for (const [subKey, subcategory] of category.items) {
       if (subcategory.title.toLowerCase() === lowerTitle) {
+        console.warn("subcategory", subcategory)
+        console.warn("lowerTitle", lowerTitle)
+
         return subKey;
       }
     }

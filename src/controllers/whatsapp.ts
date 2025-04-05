@@ -63,6 +63,13 @@ async function handleIncomingMessage(message: WhatsAppMessage, sender: string): 
         await setUserState(sender, { flow: "browsing", step: "main_menu" });
         return;
       }
+
+      if (buttonId === "specials") {
+        await sendCategoryMenu(sender, "specials");
+        await setUserState(sender, { flow: "browsing", step: "specials" });
+        return;
+      }
+    
       
       if (buttonId === "help") {
         await sendHelpMessage(sender);

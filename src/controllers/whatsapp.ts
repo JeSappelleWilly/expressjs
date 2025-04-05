@@ -9,13 +9,13 @@ import {
   sendMainMenu, 
   sendTextMessage, 
   sendCartSummary,
-  sendCustomizationOptions,
   sendPaymentOptions,
   sendOrderConfirmation,
   sendStoreLocations,
   sendDeliveryTimeEstimate,
   sendWhatsAppRequest, 
 } from "../services/whatsapp";
+
 import { addItemToCart, getCart, removeFromCart } from "../services/cart";
 import { getMenuKeyFromTitle } from "../data/menuData";
 
@@ -181,14 +181,11 @@ async function handleIncomingMessage(message: WhatsAppMessage, sender: string): 
       // Check if item has customization options
       const hasCustomizations = itemHasCustomizations(itemId);
       
-      if (hasCustomizations) {
-        await sendCustomizationOptions(sender, itemId);
-        await setUserState(sender, { flow: "customizing", step: "selecting_options", currentItemId: itemId });
-      } else {
+     
         await addItemToCart(sender, itemId);
         await sendTextMessage(sender, "Item added to cart!");
         await sendWhatsAppRequest(createNavigationButtons(sender));
-      }
+      
       return;
     }
     
@@ -428,47 +425,7 @@ async function cancelOrder(sender: string): Promise<void> {
 /**
  * Process customization option selection
  */
-async function processCustomizationOption(sender: string, optionId: string, itemId: string): Promise<void> {
-  await addCustomizationToItem(sender, itemId, optionId);
-  
-  // Check if more customizations needed
-  const moreCustomizationsAvailable = await checkForMoreCustomizations(sender, itemId);
-  
-  if (moreCustomizationsAvailable) {
-    await sendCustomizationOptions(sender, itemId, true); // true indicates continuation of customization
-  } else {
-    await sendTextMessage(sender, "Would you like to add any special instructions?");
-    await sendWhatsAppRequest({
-      recipient: sender,
-      type: "interactive",
-      interactive: {
-        type: "button",
-        body: {
-          text: "Special instructions?"
-        },
-        action: {
-          buttons: [
-            {
-              type: "reply",
-              reply: {
-                id: "add-instructions",
-                title: "Add Instructions"
-              }
-            },
-            {
-              type: "reply",
-              reply: {
-                id: "confirm-customization",
-                title: "Add to Cart"
-              }
-            }
-          ]
-        }
-      }
-    });
-    await setUserState(sender, { flow: "customizing", step: "instructions_prompt", currentItemId: itemId });
-  }
-}
+
 
 /**
  * Add special instructions to an item

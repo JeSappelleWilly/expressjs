@@ -708,7 +708,8 @@ export async function sendWelcomeWithButtons(recipient: string): Promise<any> {
         header: {
           type: "image",
           image: {
-              "link": "s3://botressources/headers/main.jpg"
+              "link": "s3://botressources/headers/main.jpg",
+              "caption": "Welcome to Dokal Food>"
           },
         },
         body: {

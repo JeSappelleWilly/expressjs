@@ -75,34 +75,27 @@ export async function sendTextMessage(recipient: string, text: string): Promise<
 
 // Create menu payload for WhatsApp API
 export function createMenuPayload(categoryId: string, recipientNumber: string): any | null {
-  const subcategory = getMenuCategory(categoryId); // Now directly getting the subcategory
+  const category = menuCategories.get(categoryId); // Get the top-level category
 
-  if (!subcategory) {
+  if (!category) {
     return null;
   }
 
-  const sections: Array<{ title: string; rows: Array<{ id: string; title: string; description: string }> }> = [];
-  let currentSection = { title: subcategory.title, rows: [] as Array<{ id: string; title: string; description: string }> };
+  const sections: Array<{ title: string; rows: Array<{ id: string; title: string; description?: string }> }> = [];
+  const subcategoryRows: Array<{ id: string; title: string; description?: string }> = [];
 
-  // Convert items to rows format for WhatsApp API
-  for (const [itemId, item] of subcategory?.items!) {
-    currentSection.rows.push({
-      id: itemId,
-      title: item.title,
-      description: `${item.description} - $${item.price?.toFixed(2) || 'Price varies'}`,
+  for (const [subcategoryId, subcategory] of category.items) {
+    subcategoryRows.push({
+      id: subcategoryId,
+      title: subcategory.title,
+      description: subcategory.description
     });
-
-    // WhatsApp has a limit of 10 items per section
-    if (currentSection.rows.length >= 10) {
-      sections.push(currentSection);
-      currentSection = { title: `${subcategory.title} (cont.)`, rows: [] };
-    }
   }
 
-  // Add remaining items
-  if (currentSection.rows.length > 0) {
-    sections.push(currentSection);
-  }
+  sections.push({
+    title: `${category.title} Options`,
+    rows: subcategoryRows
+  });
 
   const payload: any = {
     messaging_product: "whatsapp",
@@ -111,21 +104,21 @@ export function createMenuPayload(categoryId: string, recipientNumber: string): 
     type: "interactive",
     interactive: {
       type: "list",
-      header: {
+      header : {
         type: "text",
-        text: `🍽️ ${subcategory.title}`, // Use subcategory title
+        text: `🍽️ ${category.title}`
       },
       body: {
-        text: subcategory.description, // Use subcategory description
+        text: `Select an option from our ${category.title} menu:`
       },
       footer: {
-        text: "Thank you for choosing us! 🌟",
+        text: "Explore our full menu! 🌟"
       },
       action: {
-        button: "View Options",
-        sections: sections,
-      },
-    },
+        button: `View ${category.title}`,
+        sections: sections
+      }
+    }
   };
 
   return payload;
@@ -134,26 +127,23 @@ export function createMenuPayload(categoryId: string, recipientNumber: string): 
 
 export async function sendMainMenu(recipient: string): Promise<any> {
   try {
-    const sections: Array<{title: string, rows: Array<{id: string, title: string, description: string}>}> = [];
-    
-    // Convert menu structure to WhatsApp API format
+    const sections: Array<{ title: string; rows: Array<{ id: string; title: string; description?: string }> }> = [];
+
+    // Create a section for the main categories
+    const mainCategoryRows: Array<{ id: string; title: string; description?: string }> = [];
     for (const [categoryKey, category] of menuCategories) {
-      const section = {
+      mainCategoryRows.push({
+        id: categoryKey, // Use the top-level category key as the ID
         title: category.title,
-        rows: [] as Array<{id: string, title: string, description: string}>
-      };
-      
-      for (const [subcategoryKey, subcategory] of category.items) {
-        section.rows.push({
-          id: subcategory.id || subcategoryKey,
-          title: subcategory.title,
-          description: subcategory.description
-        });
-      }
-      
-      sections.push(section);
+        description: category.items.size > 0 ? `View our ${category.title} options` : 'Coming soon'
+      });
     }
-    
+
+    sections.push({
+      title: "Main Menu Categories",
+      rows: mainCategoryRows
+    });
+
     const payload: any = {
       messaging_product: "whatsapp",
       recipient_type: "individual",
@@ -162,21 +152,21 @@ export async function sendMainMenu(recipient: string): Promise<any> {
       interactive: {
         type: "list",
         header: {
-            type: "text",
-            text: "🍔 KFC Main Menu"
+          type: "text",
+          text: "🍔 KFC Main Menu"
         },
         body: {
-        text: "Welcome to our restaurant! Please select a category to view our delicious options:"
+          text: "Welcome to our restaurant! Please select a category to view our delicious options:"
         },
         footer: {
           text: "Thank you for choosing us! 🌟"
         },
         action: {
-          button: "View Menu",
+          button: "View Categories",
           sections: sections
         }
       }
-    };  
+    };
 
     const response = await sendWhatsAppRequest(payload);
     const data = await response.json();

@@ -120,7 +120,6 @@ async function handleIncomingMessage(message: WhatsAppMessage, sender: string): 
     
     // Handle customization options selection
     if (selectedKey?.startsWith("option-")) {
-      await processCustomizationOption(sender, selectedKey, userState.currentItemId);
       return;
     }
     

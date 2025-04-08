@@ -1,4 +1,6 @@
 import Redis from "ioredis";
+import { getMenuItem } from "../data/menuData";
+
 
 // Define state types
 export enum OrderStage {
@@ -15,8 +17,10 @@ export enum OrderStage {
 }
 
 export type OrderItem = {
+  // In this version, we store the menu item id (instead of a plain string)
   item: string;
   quantity: number;
+  // For customizations we store an array of strings (or you can consider a richer type)
   customizations?: string[];
   price: number;
 };
@@ -33,25 +37,16 @@ export type OrderState = {
   userName?: string;
 };
 
-// Menu data
-export const menuItems: Record<string, { price: number, customizations: string[] }> = {
-  'burger': { price: 5.99, customizations: ['cheese', 'bacon', 'lettuce', 'tomato', 'onion'] },
-  'fries': { price: 2.99, customizations: ['small', 'medium', 'large'] },
-  'soda': { price: 1.99, customizations: ['small', 'medium', 'large', 'no ice'] },
-  'pizza': { price: 8.99, customizations: ['pepperoni', 'mushroom', 'extra cheese'] },
-  'salad': { price: 4.99, customizations: ['ranch', 'italian', 'balsamic'] }
-};
-
-// Redis client
+// Redis client instance
 let redisClient: Redis;
 
-// Initialize the state manager with Redis client
+// Initialize the state manager with a Redis client
 export function initializeStateManager(client: Redis) {
   redisClient = client;
   console.log("State manager initialized with Redis client");
 }
 
-// Get user state from Redis
+// Get a user state from Redis
 export async function getUserState(userId: string): Promise<OrderState | null> {
   try {
     const stateStr = await redisClient.get(`order:${userId}`);
@@ -63,7 +58,7 @@ export async function getUserState(userId: string): Promise<OrderState | null> {
   }
 }
 
-// Save user state to Redis
+// Save the user state back to Redis
 export async function saveUserState(state: OrderState): Promise<void> {
   try {
     await redisClient.set(
@@ -80,7 +75,7 @@ export async function saveUserState(state: OrderState): Promise<void> {
 export function createNewSession(userId: string, userName?: string): OrderState {
   return {
     userId,
-    sessionId: userId + '-' + Date.now(), // Use WhatsApp ID + timestamp as session ID
+    sessionId: `${userId}-${Date.now()}`, // Using the user's ID and current timestamp
     currentStage: OrderStage.GREETING,
     items: [],
     lastInteraction: Date.now(),
@@ -89,104 +84,112 @@ export function createNewSession(userId: string, userName?: string): OrderState 
   };
 }
 
-// Clean up expired sessions (can be called periodically)
+// Clean up expired sessions (Redis TTL auto-deletes expired sessions)
 export async function cleanupExpiredSessions(): Promise<void> {
-  // Redis TTL (time to live) handles this automatically in our implementation
   console.log('Cleanup job running - Redis TTL handles expired sessions');
 }
 
-// Process an incoming message and update state accordingly
+// Process an incoming message and update the state accordingly
 export async function processUserMessage(
   userId: string,
   message: string,
   userName?: string
 ): Promise<{ response: string; updatedState: OrderState }> {
-  // Retrieve or create session
+  // Retrieve or create a session
   let state = await getUserState(userId);
   if (!state) {
     state = createNewSession(userId, userName);
   }
   
-  // Update last interaction time
+  // Update the last interaction time
   state.lastInteraction = Date.now();
-  
-  // Process message based on current stage
   let response = '';
   
   switch (state.currentStage) {
     case OrderStage.GREETING:
-      response = `Hello${state.userName ? ' ' + state.userName : ''}! Welcome to our Fast Food Bot. What would you like to order today? We have burgers, fries, pizza, soda, and salad.`;
+      response = `Hello${state.userName ? ' ' + state.userName : ''}! Welcome to our Fast Food Bot. What would you like to order today?`;
       state.currentStage = OrderStage.MENU_SELECTION;
       break;
       
-    case OrderStage.MENU_SELECTION:
+    case OrderStage.MENU_SELECTION: {
+      // Assume the message corresponds to a menu item ID (e.g., "special-1", "app-1", etc.)
       const itemRequested = message.toLowerCase();
-      if (menuItems[itemRequested]) {
-        response = `Great choice! ${itemRequested.charAt(0).toUpperCase() + itemRequested.slice(1)} costs $${menuItems[itemRequested].price}. How many would you like?`;
+      const menuItem = getMenuItem(itemRequested);
+      if (menuItem) {
+        response = `Great choice! ${menuItem.title} costs $${menuItem.price}. How many would you like?`;
         state.currentStage = OrderStage.CUSTOMIZING_ITEM;
         state.items.push({
-          item: itemRequested,
+          item: menuItem.id!,
           quantity: 1,
-          price: menuItems[itemRequested].price,
+          price: menuItem.price,
           customizations: []
         });
       } else {
-        response = "Sorry, we don't have that item. Please choose from our menu: burgers, fries, pizza, soda, or salad.";
+        response = "Sorry, we don't have that item. Please choose from our available menu items.";
       }
       break;
+    }
       
-    case OrderStage.CUSTOMIZING_ITEM:
+    case OrderStage.CUSTOMIZING_ITEM: {
       const currentItem = state.items[state.items.length - 1];
-      
-      // Try to parse quantity
+      // Attempt to parse quantity from the message
       const quantity = parseInt(message);
       if (!isNaN(quantity) && quantity > 0) {
         currentItem.quantity = quantity;
-        currentItem.price = menuItems[currentItem.item].price * quantity;
+        // Update price based on quantity
+        currentItem.price = quantity * currentItem.price;
         
-        // Show customization options
-        const customOptions = menuItems[currentItem.item].customizations;
-        response = `Would you like any customizations for your ${currentItem.item}? Options: ${customOptions.join(', ')}. Or say "none" to continue.`;
-        state.currentStage = OrderStage.CONFIRMING_ITEM;
+        // Retrieve the full menu item details to list customization options (if any)
+        const menuItem = getMenuItem(currentItem.item);
+    
+          // If there are no customization options, move straight to confirming the item
+          response = `No customization options available for ${menuItem?.title}. Added ${quantity} x ${menuItem?.title}. Would you like to add anything else? (yes/no)`;
+          // Update total amount immediately
+          state.totalAmount = state.items.reduce((sum, item) => sum + item.price, 0);
+          state.currentStage = OrderStage.ADDING_MORE;
+        
       } else {
         response = "Please enter a valid quantity as a number.";
       }
       break;
+    }
       
-    case OrderStage.CONFIRMING_ITEM:
-      const item = state.items[state.items.length - 1];
-      
+    case OrderStage.CONFIRMING_ITEM: {
+      const currentItem = state.items[state.items.length - 1];
+      const menuItem = getMenuItem(currentItem.item);
       if (message.toLowerCase() !== 'none') {
-        // Add customization
-        if (!item.customizations) {
-          item.customizations = [];
+        // Add the customization (in a full app, you might validate the option)
+        if (!currentItem.customizations) {
+          currentItem.customizations = [];
         }
-        item.customizations.push(message.toLowerCase());
-        response = `Added ${message}. Anything else for your ${item.item}? Say "none" to continue.`;
+        currentItem.customizations.push(message.toLowerCase());
+        response = `Added customization: ${message}. You can add more customizations for your ${menuItem?.title} or say "none" to continue.`;
       } else {
-        // Calculate total
+        // Calculate total price for the order
         state.totalAmount = state.items.reduce((sum, item) => sum + item.price, 0);
-        
-        response = `Added ${item.quantity} ${item.item}${item.customizations?.length ? ' with ' + item.customizations.join(', ') : ''}. Would you like anything else? (yes/no)`;
+        response = `Added ${currentItem.quantity} x ${menuItem?.title}${currentItem.customizations && currentItem.customizations.length ? ' with ' + currentItem.customizations.join(', ') : ''}. Would you like to add more items? (yes/no)`;
         state.currentStage = OrderStage.ADDING_MORE;
       }
       break;
+    }
       
-    case OrderStage.ADDING_MORE:
+    case OrderStage.ADDING_MORE: {
       if (message.toLowerCase() === 'yes') {
         response = "What else would you like to add to your order?";
         state.currentStage = OrderStage.MENU_SELECTION;
       } else if (message.toLowerCase() === 'no') {
-        response = `Your current order: ${state.items.map(item => 
-          `${item.quantity} ${item.item}${item.customizations?.length ? ' with ' + item.customizations.join(', ') : ''}`
-        ).join(', ')}. Total: $${state.totalAmount.toFixed(2)}. Ready to check out? (yes/no)`;
+        response = `Your current order: ${state.items.map(item => {
+          const mi = getMenuItem(item.item);
+          return `${item.quantity} x ${mi?.title}${item.customizations && item.customizations.length ? ' with ' + item.customizations.join(', ') : ''}`;
+        }).join(', ')}. Total: $${state.totalAmount.toFixed(2)}. Ready to check out? (yes/no)`;
         state.currentStage = OrderStage.CHECKOUT;
       } else {
         response = "Please answer with 'yes' or 'no'.";
       }
       break;
+    }
       
-    case OrderStage.CHECKOUT:
+    case OrderStage.CHECKOUT: {
       if (message.toLowerCase() === 'yes') {
         response = "Please provide your delivery address.";
         state.currentStage = OrderStage.DELIVERY_INFO;
@@ -197,39 +200,41 @@ export async function processUserMessage(
         response = "Please answer with 'yes' or 'no'.";
       }
       break;
+    }
       
-    case OrderStage.DELIVERY_INFO:
+    case OrderStage.DELIVERY_INFO: {
       state.address = message;
       response = "How would you like to pay? (cash/card)";
       state.currentStage = OrderStage.PAYMENT;
       break;
+    }
       
-    case OrderStage.PAYMENT:
-      if (message.toLowerCase() === 'cash' || message.toLowerCase() === 'card') {
+    case OrderStage.PAYMENT: {
+      if (['cash', 'card'].includes(message.toLowerCase())) {
         state.paymentMethod = message.toLowerCase();
         response = `Great! Your order summary:
-        Items: ${state.items.map(item => 
-          `${item.quantity} ${item.item}${item.customizations?.length ? ' with ' + item.customizations.join(', ') : ''}`
-        ).join(', ')}
-        Total: $${state.totalAmount.toFixed(2)}
-        Delivery to: ${state.address}
-        Payment: ${state.paymentMethod}
-        
-        Please confirm your order. (confirm/cancel)`;
+Items: ${state.items.map(item => {
+  const mi = getMenuItem(item.item);
+  return `${item.quantity} x ${mi?.title}${item.customizations && item.customizations.length ? ' with ' + item.customizations.join(', ') : ''}`;
+}).join(', ')}
+Total: $${state.totalAmount.toFixed(2)}
+Delivery to: ${state.address}
+Payment: ${state.paymentMethod}
+
+Please confirm your order. (confirm/cancel)`;
         state.currentStage = OrderStage.ORDER_CONFIRMATION;
       } else {
         response = "Please select either 'cash' or 'card' as your payment method.";
       }
       break;
+    }
       
-    case OrderStage.ORDER_CONFIRMATION:
+    case OrderStage.ORDER_CONFIRMATION: {
       if (message.toLowerCase() === 'confirm') {
         const orderNumber = Math.floor(1000 + Math.random() * 9000);
         response = `Thank you for your order! Your order #${orderNumber} has been confirmed and will be delivered in approximately 30-45 minutes. Enjoy your meal!`;
         state.currentStage = OrderStage.COMPLETED;
-        
-        // In a real app, you would trigger order processing here
-        
+        // In a real application, order processing logic would be triggered here.
       } else if (message.toLowerCase() === 'cancel') {
         response = "Your order has been canceled. Would you like to start a new order? (yes/no)";
         state.items = [];
@@ -239,22 +244,21 @@ export async function processUserMessage(
         response = "Please answer with 'confirm' or 'cancel'.";
       }
       break;
+    }
       
-    case OrderStage.COMPLETED:
-      response = "Would you like to start a new order? (yes/no)";
+    case OrderStage.COMPLETED: {
       if (message.toLowerCase() === 'yes') {
         state = createNewSession(userId, state.userName);
-        state.currentStage = OrderStage.GREETING;
-        response = "Welcome back! What would you like to order today? We have burgers, fries, pizza, soda, and salad.";
+        response = "Welcome back! What would you like to order today?";
         state.currentStage = OrderStage.MENU_SELECTION;
       } else if (message.toLowerCase() === 'no') {
         response = "Thank you for using our Fast Food Bot! Have a great day!";
       }
       break;
+    }
   }
   
-  // Save updated state
+  // Save the updated state to Redis
   await saveUserState(state);
-  
   return { response, updatedState: state };
 }

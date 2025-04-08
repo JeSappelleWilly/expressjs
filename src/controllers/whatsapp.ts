@@ -343,25 +343,25 @@ export async function sendItemList(recipient: string, subcategoryId: string): Pr
 // ----------------------------------------------------------------------
 async function initiateCheckout(sender: string): Promise<void> {
   console.warn("Initiating checkout")
-  await sendWhatsAppRequest({
-    messaging_product: "whatsapp",
-    recipient_type: "individual",
+  let headerContent: string = "🍽️ Delivery";
+  let headerType: 'text' | 'image' = "text";
+  
+  
+  const message = createButtonMessage({
     recipient: sender,
-    type: "interactive",
-    interactive: {
-      type: "button",
-      body: { text: "How would you like to receive your order ?" },
-      footer: { text: "Please select an option:" },
-      action: {
-        buttons: [
-          { type: "reply", reply: { id: "pickup", title: "Pickup" } },
-          { type: "reply", reply: { id: "delivery", title: "Delivery" } }
-        ]
-      }
-    }
+    bodyText: `How would you like to receive your order ?`,
+    footerText: "Choose your prefered option ?",
+    headerType: headerType,
+    headerContent: headerContent,
+    buttons: [
+       { id: "pickup", title: "Pickup" },
+       { id: "delivery", title: "Delivery" } 
+    ]
   });
   
+  const response = await sendWhatsAppRequest(message);  
   await setUserState(sender, { flow: "checkout", step: "selecting_method" });
+  return response;
 }
 
 async function setupPickupOrder(sender: string): Promise<void> {

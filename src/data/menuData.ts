@@ -323,6 +323,19 @@ export function getMenuKeyFromTitle(title: string): string | undefined {
   return undefined;
 }
 
+/**
+ * Helper function to format the response message for an item.
+ *
+ * @param item - The item object containing title, description, price, etc.
+ * @returns A formatted response string.
+ */
+function formatItemResponse(item: { title: string; description: string; price?: number }): string {
+  const priceText = (item.price !== undefined)
+    ? `$${item.price.toFixed(2)}`
+    : "Price varies";
+  return `You selected "${item.title}".\n${item.description}\nPrice: ${priceText}.\nWould you like to add this item to your cart?`;
+}
+
 
 /**
  * Finds a MenuItem by its id across all menu categories.
@@ -337,8 +350,9 @@ export function findMenuItemTitleById(
   for (const category of categories.values()) {
     for (const subcategory of category.items.values()) {
       const item = subcategory?.items?.get(itemId);
+      const response = formatItemResponse(item!)
       if (item) {
-        return item.title;
+        return response;
       }
     }
   }

@@ -11,7 +11,8 @@ import {
   sendPaymentOptions,
   sendStoreLocations,
   sendDeliveryTimeEstimate,
-  sendWhatsAppRequest, 
+  sendWhatsAppRequest,
+  sendSpecialMenu, 
 } from "../services/whatsapp";
 
 import { addItemToCart, getCart, removeFromCart } from "../services/cart";
@@ -63,7 +64,7 @@ async function handleIncomingMessage(message: WhatsAppMessage, sender: string): 
       }
 
       if (buttonId === "specials") {
-        await sendCategoryMenu(sender, "specials");
+        await sendSpecialMenu(sender);
         await setUserState(sender, { flow: "browsing", step: "specials" });
         return;
       }

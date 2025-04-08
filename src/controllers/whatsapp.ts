@@ -373,8 +373,22 @@ async function setupPickupOrder(sender: string): Promise<void> {
 }
 
 async function setupDeliveryOrder(sender: string): Promise<void> {
-  await sendTextMessage(sender, "Please share your delivery location. You can either:");
-  await sendTextMessage(sender, "1. Send your location through WhatsApp\n2. Type your full address");
+  const message = {
+    messaging_product: "whatsapp",
+    recipient_type: "individual",
+    type: "interactive",
+    to: sender,
+    interactive: {
+      type: "location_request_message",
+      body: {
+        text: "Let us start with your pickup. You can either manually *enter an address* or *share your current location*."
+      },
+      "action": {
+        "name": "send_location"
+      }
+    }
+  }
+  await sendWhatsAppRequest(message);
   await setUserState(sender, { flow: "checkout", step: "location_input" });
 }
 

@@ -350,9 +350,9 @@ export function findMenuItemTitleById(
   for (const category of categories.values()) {
     for (const subcategory of category.items.values()) {
       const item = subcategory?.items?.get(itemId);
-      const response = formatItemResponse(item!)
+      /// const response = formatItemResponse(item!)
       if (item) {
-        return response;
+        return `"${item.title}".\n${item.description}\nPrice: 25.500`;
       }
     }
   }

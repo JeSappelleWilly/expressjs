@@ -57,6 +57,8 @@ async function handleInteractiveListReply(message: WhatsAppMessage, sender: stri
   const listReply = message.interactive!.list_reply;
   const selectedId = listReply?.id!;
 
+  console.warn("selected item id", selectedId)
+
   const reponse = await processUserItemSelection(sender, selectedId);
   await sendTextMessage(sender, reponse);
 

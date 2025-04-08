@@ -1,5 +1,6 @@
 import { 
   CustomerLocation, 
+  MessageButton, 
   Order, 
   Store, 
   WhatsAppMessage 
@@ -18,7 +19,8 @@ import {
   sendStoreLocations,
   sendDeliveryTimeEstimate,
   sendWhatsAppRequest,
-  sendSpecialMenu 
+  sendSpecialMenu, 
+  createButtonMessage
 } from "../services/whatsapp";
 
 import { 
@@ -60,8 +62,24 @@ async function handleInteractiveListReply(message: WhatsAppMessage, sender: stri
   console.warn("selected item id", selectedId)
 
   const reponse = await processUserItemSelection(sender, selectedId);
-  await sendTextMessage(sender, reponse);
-
+    // Prepare cart content as text
+    let cartText = "🛒 *Your Cart*\n\n";
+    let totalAmount = 0;
+        // Create buttons for cart actions
+        const buttons: MessageButton[] = [
+          { id: "checkout", title: "Checkout" },
+          { id: "main-menu", title: "Add More" }
+        ];
+  const followUp = createButtonMessage({
+    recipient:sender,
+    bodyText: cartText,
+    footerText: "Ready to complete your order?",
+    headerType: "text",
+    headerContent: "🛒 Your Cart",
+    buttons: buttons.slice(0, 3) // Maximum 3 buttons allowed
+  });
+  
+  const response = await sendWhatsAppRequest(followUp);
   await setUserState(sender, { flow: "browsing", step: "item_list", currentSubcategory: selectedId });
 }
 

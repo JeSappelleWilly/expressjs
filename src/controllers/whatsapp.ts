@@ -82,6 +82,7 @@ export async function processUserItemSelection(sender: string, selectedId: strin
     // Assume that each category object has an 'items' Map where key is the item ID.
     if (category.items && category.items.has(selectedId)) {
       const item = category.items.get(selectedId);
+      console.warn("Found Item ", item);
       if (item) {
         return formatItemResponse(item);
       }
@@ -94,6 +95,7 @@ export async function processUserItemSelection(sender: string, selectedId: strin
     // Assume that each category object has an 'items' Map where key is the item ID.
     if (deal.items && deal.items.has(selectedId)) {
       const item = deal.items.get(selectedId);
+      console.warn("Found Deal Item ", item);
       if (item) {
         return formatItemResponse(item);
       }

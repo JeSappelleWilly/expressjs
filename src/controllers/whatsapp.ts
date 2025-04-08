@@ -77,6 +77,7 @@ async function handleInteractiveListReply(message: WhatsAppMessage, sender: stri
  * @returns A response string to send back to the user.
  */
 export async function processUserItemSelection(sender: string, selectedId: string): Promise<string> {
+    console.warn("filter items with id: ", selectedId)
   // First, try to find the item in main menu categories.
   for (const [categoryKey, category] of menuCategories) {
     // Assume that each category object has an 'items' Map where key is the item ID.

@@ -1,7 +1,6 @@
-import * as fs from 'fs';
 import { ButtonMessageOptions, CartItem, CustomerLocation, MenuCategory, MenuItem, MenuSubcategory, MessageButton, Order, Store } from '../data/types';
 import { headerImageUrls } from '../data/image';
-import { menuCategories } from '../data/menuData';
+import { dealsCategories, menuCategories } from '../data/menuData';
 import { getCart } from './cart';
 
 const WHATSAPP_TOKEN = process.env.WHATSAPP_TOKEN ?? ""
@@ -198,6 +197,78 @@ export async function sendMainMenu(recipient: string): Promise<any> {
   }
 }
 
+export async function sendSpecialMenu(recipient: string): Promise<any> {
+  const sections: Array<{ title: string; rows: Array<{ id: string; title: string; description?: string }> }> = [];
+  
+  // Iterate through each category and its items
+  dealsCategories.forEach((category, categoryId) => {
+    const categoryRows: Array<{ id: string; title: string; description?: string }> = [];
+    
+    // For each category, go through subcategories and collect items
+    for (const [subcategoryId, subcategory] of category.items) {
+      if (subcategory.items) {
+        // Add each menu item from this subcategory
+        for (const [itemId, item] of subcategory.items) {
+          categoryRows.push({
+            id: itemId,
+            title: item.title,
+            description: `$${item.price.toFixed(2)} - ${item.description}`
+          });
+        }
+      }
+    }
+    
+    // Only add the section if it has items
+    if (categoryRows.length > 0) {
+      sections.push({
+        title: category.title,
+        rows: categoryRows
+      });
+    }
+  });
+
+  // WhatsApp has a limit on interactive elements, so we may need to trim
+  // Maximum 10 sections, each with maximum 10 rows
+  const trimmedSections = sections.slice(0, 5).map(section => ({
+    ...section,
+    rows: section.rows.slice(0, 5)
+  }));
+
+  const payload: any = {
+    messaging_product: "whatsapp",
+    recipient_type: "individual",
+    to: recipient,
+    type: "interactive",
+    interactive: {
+      type: "list",
+      header: {
+        type: "text",
+        text: "🍽️ Our Specials Menu"
+      },
+      body: {
+        text: "Browse our deals organized by category:"
+      },
+      footer: {
+        text: "Select an item to see details and order!"
+      },
+      action: {
+        button: "View Menu",
+        sections: trimmedSections
+      }
+    }
+  };
+
+  try {
+    const response = await sendWhatsAppRequest(payload);
+    const data = await response.json();
+    console.log("Main menu with items sent:", data);
+    return data;
+  } catch (error) {
+    console.error("Error sending main menu with items:", error);
+    throw error;
+  }
+}
+
 // Send a specific category menu
 export async function sendCategoryMenu(recipient: string, categoryId: string): Promise<any | void> {
   try {
@@ -214,7 +285,6 @@ export async function sendCategoryMenu(recipient: string, categoryId: string): P
     console.log(`${categoryId} menu sent:`, data);
     
     // Send navigation buttons after sending the menu
-    await sendWhatsAppRequest(createNavigationButtons(recipient, categoryId));
     
     return data;
   } catch (error) {

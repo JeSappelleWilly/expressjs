@@ -344,6 +344,8 @@ export async function sendItemList(recipient: string, subcategoryId: string): Pr
 async function initiateCheckout(sender: string): Promise<void> {
   console.warn("Initiating checkout")
   await sendWhatsAppRequest({
+    messaging_product: "whatsapp",
+    recipient_type: "individual",
     recipient: sender,
     type: "interactive",
     interactive: {
@@ -398,6 +400,8 @@ async function processPaymentMethod(sender: string, paymentMethodId: string): Pr
   await sendTextMessage(sender, `Order Summary:\nTotal: $${total.toFixed(2)}\nPayment: ${formatPaymentMethod(paymentMethodId)}`);
   await sendWhatsAppRequest({
     recipient: sender,
+    messaging_product: "whatsapp",
+    recipient_type: "individual",
     type: "interactive",
     interactive: {
       type: "button",

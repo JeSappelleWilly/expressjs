@@ -57,25 +57,63 @@ async function handleInteractiveListReply(message: WhatsAppMessage, sender: stri
   const listReply = message.interactive!.list_reply;
   const selectedId = listReply?.id!;
 
-  // Check for a top-level category
-  const selectedCategoryId = Object.keys(menuCategories).find(key => key === selectedId);
-  if (selectedCategoryId) {
-    console.warn("Selected Category ID from Main Menu:", selectedCategoryId);
-    await sendCategoryMenu(sender, selectedCategoryId);
-    await setUserState(sender, { flow: "browsing", step: "category", currentCategory: selectedCategoryId });
-    return;
-  }
-  
-  // Otherwise handle subcategory selection
-  console.warn("Selected Subcategory ID:", selectedId);
-  // Process additional side-effects if needed
-  const orderState = await processUserMessage(sender, "", "Serge Wilfried");
-  await sendTextMessage(sender, orderState.response);
+  const reponse = await processUserItemSelection(sender, selectedId);
+  await sendTextMessage(sender, reponse);
 
   // Display items for this subcategory.
   await sendItemList(sender, selectedId);
   await setUserState(sender, { flow: "browsing", step: "item_list", currentSubcategory: selectedId });
 }
+
+
+/**
+ * Process the selection made by the user from an interactive list_reply.
+ * Looks up the selected item in both menu and deals categories.
+ *
+ * @param sender - The WhatsApp sender ID.
+ * @param selectedId - The ID of the selected item received from the interactive list_reply.
+ * @returns A response string to send back to the user.
+ */
+export async function processUserItemSelection(sender: string, selectedId: string): Promise<string> {
+  // First, try to find the item in main menu categories.
+  for (const [categoryKey, category] of menuCategories) {
+    // Assume that each category object has an 'items' Map where key is the item ID.
+    if (category.items && category.items.has(selectedId)) {
+      const item = category.items.get(selectedId);
+      if (item) {
+        return formatItemResponse(item);
+      }
+    }
+  }
+
+  // Next, check within the deals categories, assuming each dealsCategory is an object with an "items" array.
+
+  for (const [dealKey, deal] of dealsCategories) {
+    // Assume that each category object has an 'items' Map where key is the item ID.
+    if (deal.items && deal.items.has(selectedId)) {
+      const item = deal.items.get(selectedId);
+      if (item) {
+        return formatItemResponse(item);
+      }
+    }
+  }
+  // If no item is found, notify the user.
+  return "Sorry, we couldn't find the item you selected. Please try a different selection.";
+}
+
+/**
+ * Helper function to format the response message for an item.
+ *
+ * @param item - The item object containing title, description, price, etc.
+ * @returns A formatted response string.
+ */
+function formatItemResponse(item: { title: string; description: string; price?: number }): string {
+  const priceText = (item.price !== undefined)
+    ? `$${item.price.toFixed(2)}`
+    : "Price varies";
+  return `You selected "${item.title}".\n${item.description}\nPrice: ${priceText}.\nWould you like to add this item to your cart?`;
+}
+
 
 // ----------------------------------------------------------------------
 // Interactive Button Reply Handler

@@ -62,8 +62,6 @@ async function handleInteractiveListReply(message: WhatsAppMessage, sender: stri
   const reponse = await processUserItemSelection(sender, selectedId);
   await sendTextMessage(sender, reponse);
 
-  // Display items for this subcategory.
-  await sendItemList(sender, selectedId);
   await setUserState(sender, { flow: "browsing", step: "item_list", currentSubcategory: selectedId });
 }
 
@@ -86,23 +84,11 @@ export async function processUserItemSelection(sender: string, selectedId: strin
         return selectedDealItemTitle!;
       }
       return selectecMenuItemTitle!;
+  } else {
+      return "Sorry, we couldn't find the item you selected. Please try a different selection.";
   }
-  // If no item is found, notify the user.
-  return "Sorry, we couldn't find the item you selected. Please try a different selection.";
 }
 
-/**
- * Helper function to format the response message for an item.
- *
- * @param item - The item object containing title, description, price, etc.
- * @returns A formatted response string.
- */
-function formatItemResponse(item: { title: string; description: string; price?: number }): string {
-  const priceText = (item.price !== undefined)
-    ? `$${item.price.toFixed(2)}`
-    : "Price varies";
-  return `You selected "${item.title}".\n${item.description}\nPrice: ${priceText}.\nWould you like to add this item to your cart?`;
-}
 
 
 // ----------------------------------------------------------------------

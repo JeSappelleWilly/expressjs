@@ -342,6 +342,7 @@ export async function sendItemList(recipient: string, subcategoryId: string): Pr
 // Checkout & Order Process Functions
 // ----------------------------------------------------------------------
 async function initiateCheckout(sender: string): Promise<void> {
+  console.warn("Initiating checkout")
   await sendWhatsAppRequest({
     recipient: sender,
     type: "interactive",

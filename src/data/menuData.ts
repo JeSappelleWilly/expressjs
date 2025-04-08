@@ -32,6 +32,17 @@ dailySpecials.items = new Map([
       { id: "spice-level", title: "Spice Level", options: ["Mild", "Medium", "Hot"] },
       { id: "add-protein", title: "Add Protein", options: ["Chicken (+$4)", "Shrimp (+$6)"] }
     ]
+  }],
+  ["special-2", {
+    id: "special-2",
+    title: "Serge's Special Pasta",
+    description: "House-made pasta with seasonal ingredients",
+    price: 18.99,
+    imageUrl: "https://example.com/images/chefs-pasta.jpg",
+    customizationOptions: [
+      { id: "spice-level", title: "Spice Level", options: ["Mild", "Medium", "Hot"] },
+      { id: "add-protein", title: "Add Protein", options: ["Chicken (+$4)", "Shrimp (+$6)"] }
+    ]
   }]
  
 ]);
@@ -49,6 +60,13 @@ weeklyDeals.items = new Map([
     title: "Family Bundle",
     description: "Feeds 4: Includes 1 large pizza, 4 sides, and 2L drink",
     price: 39.99,
+    imageUrl: "https://example.com/images/family-bundle.jpg"
+  }],
+  ["deal-2", {
+    id: "deal-2",
+    title: "Bros Bundle",
+    description: "Feeds 2: Includes 1 large pizza, 4 sides, and 2L drink",
+    price: 19.99,
     imageUrl: "https://example.com/images/family-bundle.jpg"
   }]
 ]);

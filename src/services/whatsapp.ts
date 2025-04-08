@@ -776,11 +776,8 @@ export async function sendWelcomeWithButtons(recipient: string): Promise<any> {
       interactive: {
         type: "button",
         header: {
-          type: "image",
-          image: {
-              "link": "s3://botressources/headers/main.jpg",
-              "caption": "Welcome to Dokal Food>"
-          },
+         type: "text",
+          text: "🍽️ Welcome to Dokal Food"
         },
         body: {
           text: "Thank you for connecting with us! We're excited to serve you our delicious menu items. How would you like to proceed?"

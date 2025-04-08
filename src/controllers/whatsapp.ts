@@ -27,7 +27,7 @@ import {
   removeFromCart 
 } from "../services/cart";
 
-import { dealsCategories, menuCategories } from "../data/menuData";
+import { dealsCategories, findMenuItemTitleById, menuCategories } from "../data/menuData";
 import { processUserMessage } from "../services/stateManager";
 
 // ----------------------------------------------------------------------
@@ -77,30 +77,15 @@ async function handleInteractiveListReply(message: WhatsAppMessage, sender: stri
  * @returns A response string to send back to the user.
  */
 export async function processUserItemSelection(sender: string, selectedId: string): Promise<string> {
-    console.warn("filter items with id: ", selectedId)
-  // First, try to find the item in main menu categories.
-  for (const [categoryKey, category] of menuCategories) {
-    // Assume that each category object has an 'items' Map where key is the item ID.
-    if (category.items && category.items.has(selectedId)) {
-      const item = category.items.get(selectedId);
-      console.warn("Found Item ", item);
-      if (item) {
-        return formatItemResponse(item);
-      }
-    }
-  }
+  console.warn("filter items with id: ", selectedId)
 
-  // Next, check within the deals categories, assuming each dealsCategory is an object with an "items" array.
-
-  for (const [dealKey, deal] of dealsCategories) {
-    // Assume that each category object has an 'items' Map where key is the item ID.
-    if (deal.items && deal.items.has(selectedId)) {
-      const item = deal.items.get(selectedId);
-      console.warn("Found Deal Item ", item);
-      if (item) {
-        return formatItemResponse(item);
+  const selectecMenuItemTitle = findMenuItemTitleById(selectedId, menuCategories);
+  const selectedDealItemTitle = findMenuItemTitleById(selectedId, dealsCategories);
+    if (selectedDealItemTitle || selectecMenuItemTitle) {
+      if (selectedDealItemTitle) {
+        return selectedDealItemTitle!;
       }
-    }
+      return selectecMenuItemTitle!;
   }
   // If no item is found, notify the user.
   return "Sorry, we couldn't find the item you selected. Please try a different selection.";

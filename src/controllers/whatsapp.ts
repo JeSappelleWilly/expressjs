@@ -63,23 +63,15 @@ async function handleInteractiveListReply(message: WhatsAppMessage, sender: stri
 
   const reponse = await processUserItemSelection(sender, selectedId);
     // Prepare cart content as text
-    let cartText = "🛒 *Your Cart*\n\n";
-    let totalAmount = 0;
-        // Create buttons for cart actions
-        const buttons: MessageButton[] = [
-          { id: "checkout", title: "Checkout" },
-          { id: "main-menu", title: "Add More" }
-        ];
-  const followUp = createButtonMessage({
-    recipient:sender,
-    bodyText: cartText,
-    footerText: "Ready to complete your order?",
-    headerType: "text",
-    headerContent: "🛒 Your Cart",
-    buttons: buttons.slice(0, 3) // Maximum 3 buttons allowed
-  });
+    const cart = await getCart(sender);
   
-  const response = await sendWhatsAppRequest(followUp);
+    if (!cart || cart.items.length === 0) {
+      await sendTextMessage(sender, "Your cart is empty. Please add items before checkout.");
+      await sendMainMenu(sender);
+      return;
+    }
+  
+  await sendCartSummary(sender);  
   await setUserState(sender, { flow: "browsing", step: "item_list", currentSubcategory: selectedId });
 }
 
@@ -350,22 +342,13 @@ export async function sendItemList(recipient: string, subcategoryId: string): Pr
 // Checkout & Order Process Functions
 // ----------------------------------------------------------------------
 async function initiateCheckout(sender: string): Promise<void> {
-  const cart = await getCart(sender);
-  
-  if (!cart || cart.items.length === 0) {
-    await sendTextMessage(sender, "Your cart is empty. Please add items before checkout.");
-    await sendMainMenu(sender);
-    return;
-  }
-  
-  await sendCartSummary(sender);
-  await sendTextMessage(sender, "How would you like to receive your order?");
   await sendWhatsAppRequest({
     recipient: sender,
     type: "interactive",
     interactive: {
       type: "button",
-      body: { text: "Please select an option:" },
+      body: { text: "How would you like to receive your order ?" },
+      footer: { text: "Please select an option:" },
       action: {
         buttons: [
           { type: "reply", reply: { id: "pickup", title: "Pickup" } },

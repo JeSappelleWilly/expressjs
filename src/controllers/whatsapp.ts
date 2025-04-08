@@ -1,24 +1,21 @@
-import { CartItem, CustomerLocation, MessageButton, Order, Store, WhatsAppMessage } from "../data/types";
+import { CustomerLocation, Order, Store, WhatsAppMessage } from "../data/types";
 import { 
   createNavigationButtons, 
   getMenuCategory, 
-  getMenuItem, 
   sendCategoryMenu, 
   sendHelpMessage, 
-  sendItemDetails, 
   sendMainMenu, 
   sendTextMessage,
   sendWelcomeWithButtons,
   sendCartSummary,
   sendPaymentOptions,
-  sendOrderConfirmation,
   sendStoreLocations,
   sendDeliveryTimeEstimate,
   sendWhatsAppRequest, 
 } from "../services/whatsapp";
 
 import { addItemToCart, getCart, removeFromCart } from "../services/cart";
-import { getCategoryKeyFromTitle, getMenuKeyFromTitle, menuCategories } from "../data/menuData";
+import { menuCategories } from "../data/menuData";
 
 
 

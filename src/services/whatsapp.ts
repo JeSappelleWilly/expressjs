@@ -34,22 +34,26 @@ export function getMenuItem(itemId: string): MenuItem | null {
 
 
 // Send WhatsApp API requests
-export async function sendWhatsAppRequest(payload: any): Promise<Response> {
-  const token = WHATSAPP_TOKEN;
-  if (!token) {
-    throw new Error("WhatsApp API token not found");
-  }
-
-  const url = `${WHATSAPP_API_URL}/${WHATSAPP_PHONE_NUMBER_ID}/messages`
+export async function sendWhatsAppRequest(payload: any): Promise<any> {
+  try {
+    const token = WHATSAPP_TOKEN;
+    if (!token) {
+      throw new Error("WhatsApp API token not found");
+    }
   
-  return fetch(url, {
-    method: 'POST',
-    headers: {
-      'Authorization': `Bearer ${token}`,
-      'Content-Type': 'application/json'
-    },
-    body: JSON.stringify(payload)
-  });
+    const url = `${WHATSAPP_API_URL}/${WHATSAPP_PHONE_NUMBER_ID}/messages`
+    
+    return fetch(url, {
+      method: 'POST',
+      headers: {
+        'Authorization': `Bearer ${token}`,
+        'Content-Type': 'application/json'
+      },
+      body: JSON.stringify(payload)
+    });
+  } catch (error) {
+    console.error(error)
+  } 
 }
 
 // Send a simple text message

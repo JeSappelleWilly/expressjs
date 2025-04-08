@@ -4,9 +4,10 @@ import { MenuCategory, MenuItem, MenuSubcategory } from "../data/types";
  * Menu data structure with categories, subcategories, and items
  */
 export const menuCategories: Map<string, MenuCategory> = new Map();
+export const dealsCategories: Map<string, MenuCategory> = new Map();
 
 // Specials Category
-const specialsCategory: MenuCategory = {
+export const specialsCategory: MenuCategory = {
   id: "specials",
   title: "Today's Specials",
   description: "Limited time offers and daily specials",
@@ -54,7 +55,6 @@ weeklyDeals.items = new Map([
 
 specialsCategory.items.set("daily-specials", dailySpecials);
 specialsCategory.items.set("weekly-deals", weeklyDeals);
-menuCategories.set("specials", specialsCategory);
 
 // Appetizers Category
 const appetizersCategory: MenuCategory = {
@@ -151,6 +151,7 @@ grill.items = new Map([
 mainsCategory.items.set("pasta", pasta);
 mainsCategory.items.set("grill", grill);
 menuCategories.set("mains", mainsCategory);
+dealsCategories.set("specials", specialsCategory);
 
 // Beverages Category
 const beveragesCategory: MenuCategory = {

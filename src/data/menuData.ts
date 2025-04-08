@@ -322,3 +322,25 @@ export function getMenuKeyFromTitle(title: string): string | undefined {
   }
   return undefined;
 }
+
+
+/**
+ * Finds a MenuItem by its id across all menu categories.
+ * @param itemId The id of the menu item to search for.
+ * @param categories The Map of MenuCategory to search in.
+ * @returns The title of the found item or undefined if not found.
+ */
+export function findMenuItemTitleById(
+  itemId: string,
+  categories: Map<string, MenuCategory>
+): string | undefined {
+  for (const category of categories.values()) {
+    for (const subcategory of category.items.values()) {
+      const item = subcategory?.items?.get(itemId);
+      if (item) {
+        return item.title;
+      }
+    }
+  }
+  return undefined; // not found
+}

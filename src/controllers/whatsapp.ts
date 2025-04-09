@@ -60,19 +60,20 @@ async function handleInteractiveListReply(message: WhatsAppMessage, sender: stri
   const selectedId = listReply?.id!;
 
   console.warn("selected item id", selectedId)
-
+  if(selectedId.startsWith("payment")){
+      await confirmFinalOrder(sender);
+  } else {
   const reponse = await processUserItemSelection(sender, selectedId);
     // Prepare cart content as text
     const cart = await getCart(sender);
-  
     if (!cart || cart.items.length === 0) {
       await sendTextMessage(sender, "Your cart is empty. Please add items before checkout.");
       await sendMainMenu(sender);
       return;
     }
-  
-  await sendCartSummary(sender);  
-  await setUserState(sender, { flow: "browsing", step: "item_list", currentSubcategory: selectedId });
+    await sendCartSummary(sender);  
+    await setUserState(sender, { flow: "browsing", step: "item_list", currentSubcategory: selectedId });
+  }
 }
 
 

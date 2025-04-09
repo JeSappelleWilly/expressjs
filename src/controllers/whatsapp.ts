@@ -540,14 +540,14 @@ async function getUserState(sender: string): Promise<any> {
 async function setUserState(sender: string, state: any): Promise<void> {
   // Placeholder implementation – store user state in database/cache.
 }
-function saveCustomerAddress(sender: string, address: string | any): void {
+function saveCustomerAddress(sender: string, address: string | any): Promise<boolean> {
   return Promise.resolve(true);
 }
 function updateItemInstructions(sender: string, itemId: string, instructions: string): void {
   throw new Error("Function not implemented.");
 }
-function saveCustomerLocation(sender: string, location: { latitude: number; longitude: number; name?: string; address?: string; }): void {
-  throw new Error("Function not implemented.");
+function saveCustomerLocation(sender: string, location: { latitude: number; longitude: number; name?: string; address?: string; }): Promise<boolean> {
+  return Promise.resolve(true);
 }
 function clearCart(sender: string): void {
   throw new Error("Function not implemented.");

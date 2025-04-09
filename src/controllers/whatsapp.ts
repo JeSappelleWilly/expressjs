@@ -278,8 +278,7 @@ async function handleLocationMessage(message: WhatsAppMessage, sender: string, u
     return;
   }
   
-  await sendTextMessage(sender, "Thank you for sharing your location. We'll use this information for your order.");
-  await sendStoreLocations(sender, message.location);
+  await sendPaymentOptions(sender);
 }
 
 // ----------------------------------------------------------------------

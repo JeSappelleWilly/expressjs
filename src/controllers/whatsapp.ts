@@ -61,7 +61,7 @@ async function handleInteractiveListReply(message: WhatsAppMessage, sender: stri
 
   console.warn("selected item id", selectedId)
   if(selectedId.startsWith("payment")){
-      await confirmFinalOrder(sender);
+    await processPaymentMethod(sender, selectedId)
   } else {
   const reponse = await processUserItemSelection(sender, selectedId);
     // Prepare cart content as text

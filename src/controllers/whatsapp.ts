@@ -541,7 +541,7 @@ async function setUserState(sender: string, state: any): Promise<void> {
   // Placeholder implementation – store user state in database/cache.
 }
 function saveCustomerAddress(sender: string, address: string | any): void {
-  throw new Error("Function not implemented.");
+  return Promise.resolve(true);
 }
 function updateItemInstructions(sender: string, itemId: string, instructions: string): void {
   throw new Error("Function not implemented.");

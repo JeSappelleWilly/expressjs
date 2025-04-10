@@ -15,6 +15,7 @@ import {
   sendTextMessage,
   sendWelcomeWithButtons,
   createCheckoutButtons,
+  sendOrderConfirmation,
   sendCartSummary,
   sendPaymentOptions,
   sendStoreLocations,

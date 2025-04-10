@@ -421,8 +421,8 @@ async function processPaymentMethod(sender: string, paymentMethodId: string): Pr
       body: { text: `Order Summary:\nTotal: $${total.toFixed(2)}\nPayment: ${formatPaymentMethod(paymentMethodId)}` },
       action: {
         buttons: [
-          { type: "reply", reply: { id: "confirm-order", title: "Confirm Order" } },
-          { type: "reply", reply: { id: "cancel-order", title: "Cancel" } }
+          { id: "confirm-order", title: "Confirm Order" },
+          { id: "cancel-order", title: "Cancel" } 
         ]
       }
     }

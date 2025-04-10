@@ -446,6 +446,8 @@ async function confirmFinalOrder(sender: string): Promise<void> {
     // Clear cart and update state on successful order
     await clearCart(sender);
     await setUserState(sender, { flow: "browsing", step: "main_menu" });
+    await sleep(300).then(() => confirmOrder(sender, cart, userState));
+
   } else {
     await sendTextMessage(sender, "Sorry, there was an issue processing your payment. Please try again or select a different payment method.");
     await sendPaymentOptions(sender);
@@ -660,6 +662,11 @@ function checkForMoreCustomizations(sender: string, itemId: string): any {
 function applyDiscount(sender: string, code: string): any {
   throw new Error("Function not implemented.");
 }
+
+function sleep(ms) {
+  return new Promise(resolve => setTimeout(resolve, ms));
+}
+
 function getNearbyStores(customerLocation?: CustomerLocation): Promise<Store[]> {
   // Placeholder for getting nearby stores
   return Promise.resolve([

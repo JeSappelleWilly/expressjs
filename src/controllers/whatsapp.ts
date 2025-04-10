@@ -663,7 +663,7 @@ function applyDiscount(sender: string, code: string): any {
   throw new Error("Function not implemented.");
 }
 
-function sleep(ms) {
+function sleep(ms: number) {
   return new Promise(resolve => setTimeout(resolve, ms));
 }
 

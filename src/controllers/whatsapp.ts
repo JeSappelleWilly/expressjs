@@ -411,7 +411,6 @@ async function processPaymentMethod(sender: string, paymentMethodId: string): Pr
   const cart = await getCart(sender);
   const total = calculateTotal(cart);
   
-  await sendTextMessage(sender, `Order Summary:\nTotal: $${total.toFixed(2)}\nPayment: ${formatPaymentMethod(paymentMethodId)}`);
   await sendWhatsAppRequest({
     recipient: sender,
     messaging_product: "whatsapp",
@@ -419,7 +418,7 @@ async function processPaymentMethod(sender: string, paymentMethodId: string): Pr
     type: "interactive",
     interactive: {
       type: "button",
-      body: { text: "Ready to complete your order?" },
+      body: { text: `Order Summary:\nTotal: $${total.toFixed(2)}\nPayment: ${formatPaymentMethod(paymentMethodId)}` },
       action: {
         buttons: [
           { type: "reply", reply: { id: "confirm-order", title: "Confirm Order" } },

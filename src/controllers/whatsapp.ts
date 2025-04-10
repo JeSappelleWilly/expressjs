@@ -542,8 +542,8 @@ function clearCart(sender: string): void {
 function createOrder(sender: string, cart: any, userState: any): any {
   throw new Error("Function not implemented.");
 }
-function processPayment(sender: string, paymentMethod: any): any {
-  throw new Error("Function not implemented.");
+function processPayment(sender: string, paymentMethod: any): Promise<boolean> {
+  return Promise.resolve(true);
 }
 function addCustomizationToItem(sender: string, itemId: string, optionId: string): void {
   throw new Error("Function not implemented.");

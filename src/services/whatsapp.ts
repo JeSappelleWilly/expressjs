@@ -348,6 +348,29 @@ export async function sendItemDetails(recipient: string, itemId: string): Promis
   return response.json();
 }
 
+export function createCheckoutButtons(recipient: string, paymentMethod: string, bodyText: string, headerText: string ): any {
+  const buttons: MessageButton[] = [];
+  buttons.push({ id: "main-menu", title: "Add More" });
+
+  const isCash = paymentMethod.includes("cash");
+
+  // If we're in a subcategory, add "Back to Main Menu" button
+  if (isCash) {
+    buttons.push({ id: "confirm", title: "Confirm Order" });
+  } else {
+    buttons.push({ id: "pay-now", title: "Pay Now" });
+  }
+  // Always have help option
+  buttons.push({ id: "help", title: "Help" });
+  
+  return createButtonMessage({
+    recipient,
+    bodyText: bodyText,
+    headerType: "text", 
+    headerContent: headerText,
+    buttons: buttons.slice(0, 3) // WhatsApp only allows up to 3 buttons
+  });
+}
 // Create navigation buttons
 export function createNavigationButtons(recipient: string, currentCategory: string | null = null): any {
   const buttons: MessageButton[] = [];

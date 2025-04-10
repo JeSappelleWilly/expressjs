@@ -411,9 +411,9 @@ async function processPaymentMethod(sender: string, paymentMethodId: string): Pr
   await setUserState(sender, { flow: "checkout", step: "confirming_order", paymentMethod: paymentMethodId });
   const cart = await getCart(sender);
   const total = calculateTotal(cart);
-  const headerContent = "✅ Order Confirmed";
+  const headerContent = "✅ Order Summary";
 
-  const messageBody = `Order Summary:\nTotal: $${total.toFixed(2)}\nPayment: ${formatPaymentMethod(paymentMethodId)}`;
+  const messageBody = `Total: $${total.toFixed(2)}\nPayment: ${formatPaymentMethod(paymentMethodId)}`;
   await sendWhatsAppRequest(createCheckoutButtons(sender, paymentMethodId,messageBody, headerContent));
 }
 

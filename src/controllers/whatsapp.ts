@@ -592,6 +592,47 @@ async function createOrder(sender: string, cart: any, userState: any): Promise<O
   
   // In a real implementation, this would be saved to a database
   console.log("Order created:", order);
+  return order;
+}
+
+async function confirmOrder(sender: string, cart: any, userState: any): Promise<Order> {
+  console.log(`Creating order for ${sender}`);
+  
+  // Generate a unique order ID
+  const orderId = `ORD-${Date.now().toString().substr(-6)}`;
+  
+  // Determine if this is pickup or delivery
+  const isPickup = userState.flow === "checkout" && 
+                  (userState.orderType === "pickup" || !userState.hasDeliveryAddress);
+  
+  // Get the selected store or nearest store
+  const selectedStoreId = userState.selectedStoreId || "store1"; // Default to first store if none selected
+  const stores = await getNearbyStores(userState.location);
+  const store = stores.find(s => s.id === selectedStoreId) || stores[0];
+  
+  // Calculate estimated time based on order type
+  const baseTime = isPickup ? 15 : 30; // minutes
+  const estimatedTime = baseTime + (cart.items.length * 2); // 2 extra minutes per item
+  
+  // Create the order object
+  const order: Order = {
+    id: orderId,
+    items: cart.items,
+    total: calculateTotal(cart),
+    subtotal: calculateSubtotal(cart),
+    tax: calculateTax(cart),
+    discount: cart.discounts || [],
+    type: isPickup ? "pickup" : "delivery",
+    paymentMethod: userState.paymentMethod,
+    estimatedTime: estimatedTime,
+    store: store,
+    deliveryAddress: userState.deliveryAddress || null,
+    notes: "",
+    totalAmount: calculateTotal(cart)
+  };
+  
+  // In a real implementation, this would be saved to a database
+  console.log("Order created:", order);
   
   // Send confirmation message to the customer
   const orderTypeText = isPickup ? "pickup" : "delivery";
@@ -605,7 +646,6 @@ async function createOrder(sender: string, cart: any, userState: any): Promise<O
   
   return order;
 }
-
 
 
 function processPayment(sender: string, paymentMethod: any): Promise<boolean> {

@@ -417,20 +417,30 @@ async function processPaymentMethod(sender: string, paymentMethodId: string): Pr
   await sendWhatsAppRequest(createCheckoutButtons(sender, paymentMethodId,messageBody, headerContent));
 }
 
+// Helper function for calculating subtotal
+function calculateSubtotal(cart: any): number {
+  return cart.items.reduce((total: number, item: any) => total + (item.price * (item.quantity || 1)), 0);
+}
+
+// Helper function for calculating tax
+function calculateTax(cart: any): number {
+  const subtotal = calculateSubtotal(cart);
+  return subtotal * 0.08; // Assuming 8% tax rate
+}
+
 async function confirmFinalOrder(sender: string): Promise<void> {
   const userState = await getUserState(sender);
   const cart = await getCart(sender);
   
   // Process payment using stored payment method
-  const paymentResult = await processPayment(sender, userState.paymentMethod);
-  const paymentSuccess = true;  // Replace with actual result from paymentResult
+  const paymentSuccess = await processPayment(sender, userState.paymentMethod);
   
   if (paymentSuccess) {
     // Create order in system
     const order = await createOrder(sender, cart, userState);
     
-    // Optionally: send confirmation (e.g., sendOrderConfirmation)
-    // await sendTextMessage(sender, `Your order #${order.id} has been confirmed! ${getOrderStatusMessage(order)}`);
+    /// Send confirmation (e.g., sendOrderConfirmation)
+    await sendOrderConfirmation(sender, order)
     
     // Clear cart and update state on successful order
     await clearCart(sender);

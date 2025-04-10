@@ -14,6 +14,7 @@ import {
   sendMainMenu, 
   sendTextMessage,
   sendWelcomeWithButtons,
+  createCheckoutButtons,
   sendCartSummary,
   sendPaymentOptions,
   sendStoreLocations,
@@ -410,23 +411,10 @@ async function processPaymentMethod(sender: string, paymentMethodId: string): Pr
   await setUserState(sender, { flow: "checkout", step: "confirming_order", paymentMethod: paymentMethodId });
   const cart = await getCart(sender);
   const total = calculateTotal(cart);
-  
-  await sendWhatsAppRequest({
-    recipient: sender,
-    messaging_product: "whatsapp",
-    recipient_type: "individual",
-    type: "interactive",
-    interactive: {
-      type: "button",
-      body: { text: `Order Summary:\nTotal: $${total.toFixed(2)}\nPayment: ${formatPaymentMethod(paymentMethodId)}` },
-      action: {
-        buttons: [
-          { id: "confirm-order", title: "Confirm Order" },
-          { id: "cancel-order", title: "Cancel" } 
-        ]
-      }
-    }
-  });
+  const headerContent = "✅ Order Confirmed";
+
+  const messageBody = `Order Summary:\nTotal: $${total.toFixed(2)}\nPayment: ${formatPaymentMethod(paymentMethodId)}`;
+  await sendWhatsAppRequest(createCheckoutButtons(sender, paymentMethodId,messageBody, headerContent));
 }
 
 async function confirmFinalOrder(sender: string): Promise<void> {

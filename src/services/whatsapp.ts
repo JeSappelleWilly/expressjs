@@ -356,7 +356,7 @@ export function createCheckoutButtons(recipient: string, paymentMethod: string, 
 
   // If we're in a subcategory, add "Back to Main Menu" button
   if (isCash) {
-    buttons.push({ id: "confirm", title: "Confirm Order" });
+    buttons.push({ id: "confirm-order", title: "Confirm Order" });
   } else {
     buttons.push({ id: "pay-now", title: "Pay Now" });
   }

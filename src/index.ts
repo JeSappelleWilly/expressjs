@@ -10,7 +10,7 @@ app.use(express.json());
 
 const VERIFY_TOKEN = process.env.VERIFY_TOKEN || "ceSecret";
 const REDIS_URL = process.env.REDIS_URL;
-
+const redis = RedisClient.getInstance(REDIS_URL);
 
 // Connect to Redis and start the server
 async function startServer() {
@@ -93,7 +93,6 @@ async function startServer() {
             console.log("Received message without ID, skipping");
             return res.status(200).send('OK');
         }
-        const redis = RedisClient.getInstance(REDIS_URL)
         const handler = new WhatsAppHandler(redis);
         await handler.handleIncomingMessage(message, sender);        
        

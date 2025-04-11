@@ -1,5 +1,6 @@
 import express from "express";
 import { WhatsAppHandler } from "./handlers/whatsappHandler";
+import { RedisClient } from "./services/redisClient";
 
 const app = express();
 const port = process.env.PORT || 3333;
@@ -92,7 +93,8 @@ async function startServer() {
             console.log("Received message without ID, skipping");
             return res.status(200).send('OK');
         }
-        const handler = new WhatsAppHandler(REDIS_URL);
+        const redis = RedisClient.getInstance(REDIS_URL)
+        const handler = new WhatsAppHandler(redis);
         await handler.handleIncomingMessage(message, sender);        
        
         

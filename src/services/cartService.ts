@@ -3,7 +3,6 @@ import { WhatsAppService } from "./whatsappService";
 import { MessageFactory } from "./messageFactory";
 import { findMenuItemById } from "../data/utils";
 import Redis from "ioredis";
-import { RedisClient } from "./redisClient";
 import { Cart, CartItem } from "../data/types";
 
 /**
@@ -20,9 +19,9 @@ export class CartService {
    * @param whatsAppService The WhatsApp service for sending messages
    * @param redisUrl Redis connection URL (optional)
    */
-  constructor(whatsAppService: WhatsAppService, redisUrl?: string) {
+  constructor(whatsAppService: WhatsAppService, redisClient: Redis) {
     this.whatsAppService = whatsAppService;
-    this.redisClient = RedisClient.getInstance(redisUrl);
+    this.redisClient = redisClient;
   }
   
 

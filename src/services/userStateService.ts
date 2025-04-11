@@ -1,6 +1,5 @@
 // services/userStateService.ts
 import { UserState, OrderFlow, OrderStep } from "../data/types";
-import { RedisClient } from "./redisClient";
 import Redis from "ioredis";
 
 /**
@@ -15,8 +14,8 @@ export class UserStateService {
    * Creates a new UserStateService
    * @param redisUrl Redis connection URL (optional)
    */
-  constructor(redisUrl?: string) {
-    this.redisClient = RedisClient.getInstance(redisUrl);
+  constructor(redisClient: Redis) {
+    this.redisClient = redisClient;
   }
   
   /**

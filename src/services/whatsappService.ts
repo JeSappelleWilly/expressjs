@@ -12,7 +12,7 @@ export class WhatsAppService {
     private authToken: string;
     
     constructor(config?: { apiUrl?: string, authToken?: string }) {
-      this.apiUrl = config?.apiUrl || process.env.WHATSAPP_API_URL || WHATSAPP_API_URL;
+      this.apiUrl = WHATSAPP_API_URL;
       this.authToken = config?.authToken || process.env.WHATSAPP_AUTH_TOKEN || '';
     }
     

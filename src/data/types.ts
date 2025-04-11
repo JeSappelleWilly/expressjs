@@ -128,8 +128,11 @@ export interface Order {
   
  
   export interface MessageButton {
-    id: string;
-    title: string;
+    type: string;
+    reply:  {
+      id: string;
+      title: string;
+    }
   }
   
   export interface ButtonMessageOptions {
@@ -190,10 +193,6 @@ export interface Order {
     value: number;
   }
   
-  export interface MessageButton {
-    id: string;
-    title: string;
-  }
   
   export interface WhatsAppMessage {
     text?: {

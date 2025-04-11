@@ -50,13 +50,15 @@ export class MessageFactory {
           }
         }),
         action: {
-          buttons: buttons.map(button => ({
-            type: "reply",
-            reply: {
-              id: button.id,
-              title: button.title
-            }
-          }))
+          buttons: [
+        {
+          "type": "reply",
+          "reply": {
+            "id": "menu",
+            "title": "See Menu"
+          }
+        }
+      ]
         }
       }
     };

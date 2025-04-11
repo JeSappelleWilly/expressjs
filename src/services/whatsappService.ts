@@ -34,6 +34,8 @@ export class WhatsAppService {
         },
         body: JSON.stringify(payload)
       });
+
+      console.warn(JSON.stringify(payload));
       
       if (!response.ok) {
         throw new Error(`WhatsApp API error: ${response.status} ${response.statusText}`);

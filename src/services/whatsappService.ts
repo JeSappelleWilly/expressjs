@@ -21,6 +21,7 @@ export class WhatsAppService {
      */
     async sendMessage(payload: any): Promise<any> {
       try {
+        console.warn("phone number", this.apiUrl!);
         const response = await fetch(this.apiUrl, {
           method: 'POST',
           headers: {

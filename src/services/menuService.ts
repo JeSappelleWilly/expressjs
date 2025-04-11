@@ -148,8 +148,14 @@ export class MenuService {
                         headerContent: "🛒 Add to Cart",
                         bodyText: `Would you like to add ${menuItem.title} to your cart?`,
                         buttons: [
-                            { id: `add-cart-${itemId}`, title: "Add to Cart" },
-                            { id: "main-menu", title: "Back to Menu" }
+                            {
+                                reply: { id: `add-cart-${itemId}`, title: "Add to Cart" },
+                                type: "reply"
+                            },
+                            {
+                                reply: { id: "main-menu", title: "Back to Menu" },
+                                type: "reply"
+                            }                            
                         ]
                     })
                 );
@@ -175,7 +181,7 @@ export class MenuService {
      */
     async sendWelcomeWithButtons(sender: string): Promise<void> {
         try {
-             const welcomeText = "👋 Welcome to our Restaurant!\n\n" +
+            const welcomeText = "👋 Welcome to our Restaurant!\n\n" +
                 "We're delighted to serve you through WhatsApp. " +
                 "What would you like to do today?";
                 const footer = "Lucky Shrub: Your gateway to succulents!™"
@@ -207,7 +213,7 @@ export class MenuService {
                         
                     ]
                 })
-            );           
+            );
         } catch (error) {
             console.error(`Error sending welcome message to ${sender}:`, error);
             throw error;
@@ -238,8 +244,15 @@ export class MenuService {
                     headerContent: "🌟 Special Offers",
                     bodyText: "Would you like to order a special item or see our full menu?",
                     buttons: [
-                        { id: "order-special", title: "Order Special" },
-                        { id: "main-menu", title: "Full Menu" }
+                        {
+                            reply: { id: "order-special", title: "Order Special" },
+                            type: "reply"
+                        },
+                        {
+                            reply: { id: "main-menu", title: "Full Menu" },
+                            type: "reply"
+                        },
+                        
                     ]
                 })
             );
@@ -276,8 +289,15 @@ export class MenuService {
                     headerContent: "📞 Customer Support",
                     bodyText: "What would you like to do next?",
                     buttons: [
-                        { id: "talk-representative", title: "Talk to Agent" },
-                        { id: "main-menu", title: "Back to Menu" }
+                        {
+                            reply: { id: "talk-representative", title: "Talk to Agent" },
+                            type: "reply"
+                        },
+                        {
+                            reply: { id: "main-menu", title: "Back to Menu" },
+                            type: "reply"
+                        }
+                        
                     ]
                 })
             );

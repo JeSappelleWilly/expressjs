@@ -50,15 +50,7 @@ export class MessageFactory {
           }
         }),
         action: {
-          buttons: [
-        {
-          "type": "reply",
-          "reply": {
-            "id": "menu",
-            "title": "See Menu"
-          }
-        }
-      ]
+          buttons: buttons
         }
       }
     };
@@ -143,9 +135,19 @@ export class MessageFactory {
       bodyText: "What would you like to do next?",
       footerText: "Choose an option below",
       buttons: [
-        { id: "main-menu", title: "Main Menu" },
-        { id: "view-cart", title: "View Cart" },
-        { id: "help", title: "Help" }
+        {
+          reply: { id: "main-menu", title: "Main Menu" },
+          type: "reply"
+        },
+        {
+          reply: { id: "view-cart", title: "View Cart" },
+          type: "reply"
+        },
+        {
+          reply: { id: "help", title: "Help" },
+          type: "reply"
+        },
+        
       ]
     });
   }
@@ -165,9 +167,15 @@ export class MessageFactory {
       headerContent: headerText,
       bodyText: summaryText,
       footerText: "Ready to complete your order?",
-      buttons: [
-        { id: "confirm-order", title: "Confirm Order" },
-        { id: "cancel-order", title: "Cancel Order" }
+      buttons: [    
+        {
+          reply:{ id: "confirm-order", title: "Confirm Order" },
+          type: "reply"
+        },
+        {
+          reply: { id: "cancel-order", title: "Cancel Order" },
+          type: "reply"
+        },
       ]
     });
   }

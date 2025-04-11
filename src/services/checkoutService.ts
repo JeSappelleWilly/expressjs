@@ -76,8 +76,14 @@ export class CheckoutService {
                     headerContent: "🛒 Checkout",
                     bodyText: "How would you like to receive your order?",
                     buttons: [
-                        { id: "pickup", title: "Pickup" },
-                        { id: "delivery", title: "Delivery" }
+                        {
+                            reply: { id: "pickup", title: "Pickup" },
+                            type: "reply"
+                        },
+                        {
+                            reply: { id: "delivery", title: "Delivery" },
+                            type: "reply"
+                        },
                     ]
                 })
             );
@@ -136,8 +142,14 @@ export class CheckoutService {
                     headerContent: "📍 Delivery Address",
                     bodyText: "Please share your delivery address. You can either:\n\n1. Type your address\n2. Share your location",
                     buttons: [
-                        { id: "share-location", title: "Share Location" },
-                        { id: "cancel-checkout", title: "Cancel" }
+                        {
+                            reply: { id: "share-location", title: "Share Location" },
+                            type: "reply"
+                        },
+                        {
+                            reply: { id: "cancel-checkout", title: "Cancel" },
+                            type: "reply"
+                        }                        
                     ]
                 })
             );
@@ -427,8 +439,15 @@ export class CheckoutService {
                     headerContent: "Confirm Your Order",
                     bodyText: "Would you like to place this order now?",
                     buttons: [
-                        { id: "confirm-order", title: "Place Order" },
-                        { id: "cancel-order", title: "Cancel" }
+                        {
+                            reply: { id: "confirm-order", title: "Place Order" },
+                            type: "reply"
+                        },
+                        {
+                            reply: { id: "cancel-order", title: "Cancel" },
+                            type: "reply"
+                        },
+                        
                     ]
                 })
             );
@@ -505,8 +524,15 @@ export class CheckoutService {
                     headerContent: "What would you like to do next?",
                     bodyText: "You can place another order or check your order status.",
                     buttons: [
-                        { id: "main-menu", title: "Return to Menu" },
-                        { id: "my-orders", title: "My Orders" }
+                        {
+                            reply: { id: "main-menu", title: "Return to Menu" },
+                            type: "reply"
+                        },
+                        {
+                            reply: { id: "my-orders", title: "My Orders" },
+                            type: "reply"
+                        },
+                        
                     ]
                 })
             );
@@ -573,8 +599,15 @@ export class CheckoutService {
                     headerContent: "What would you like to do next?",
                     bodyText: "You can continue shopping or view your cart.",
                     buttons: [
-                        { id: "main-menu", title: "Main Menu" },
-                        { id: "view-cart", title: "View Cart" }
+                        {
+                            reply: { id: "main-menu", title: "Main Menu" },
+                            type: "reply"
+                        },
+                        {
+                            reply: { id: "view-cart", title: "View Cart" },
+                            type: "reply"
+                        },
+                        
                     ]
                 })
             );

@@ -131,7 +131,9 @@ async function startServer() {
 process.on('SIGINT', async () => {
   console.log('Shutting down server...');
   try {
-    console.log('connection closed');
+    const redis = await RedisClient.getInstance(REDIS_URL);
+    await redis.close();
+    console.log("Redis connection closed");
     process.exit(0);
   } catch (err) {
     console.error('Error during shutdown:', err);

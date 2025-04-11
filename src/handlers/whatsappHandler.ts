@@ -6,6 +6,7 @@ import { WhatsAppMessage } from "../data/types";
 import { CartService } from "../services/cartService";
 import { MenuService } from "../services/menuService";
 import { CheckoutService } from "../services/checkoutService";
+import Express from 'express';
 
 import Redis from "ioredis";
 
@@ -34,7 +35,7 @@ export class WhatsAppHandler {
   }
 
 
-  verify = (req:any, res:any) => {
+  verify = (req:Express.Request, res:Express.Response) => {
     const mode = req.query["hub.mode"];
     const token = req.query["hub.verify_token"];
     const challenge = req.query["hub.challenge"];
@@ -49,7 +50,7 @@ export class WhatsAppHandler {
     }
   };
 
-  async process(req:any, res:any) {
+  async process(req:Express.Request, res:Express.Response) {
     try {
       console.log("-------------- New Webhook POST --------------");
       console.log("Headers:", JSON.stringify(req.headers, null, 3));

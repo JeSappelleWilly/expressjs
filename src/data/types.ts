@@ -1,41 +1,27 @@
-export interface Cart {
-  id?: string;
-  items: CartItem[];
-  totalAmount: number
-}
-
-
-export interface CartItem {
-  id?: string;
-  item: MenuItem;
-
-    name: string;
-    description: string;
-    price: number;
-    quantity: number;
-    customizations: [];
-    specialInstructions: string
-}
-
-
 export interface Store {
   id?: string;
   name: string;
   phone: string;
   hours: string;
   distance: number;
-  address: {}
+  address?: Address; // Use the Address interface
 }
 
 export interface CustomerLocation {
   id?: string;
   name?: string;
-  address?: {}
-  longitude: number;
+  address?: Address; // Use the Address interface
+  longitude: number;  
   latitude: number;
 }
 
-
+interface Address {
+  street: string;
+  city: string;
+  state: string;
+  zipCode: string;
+  country?: string;
+}
 
 export interface Order {
   id?: string;
@@ -54,12 +40,7 @@ export interface Order {
 }
 
 
-export interface MenuItem {
-    id?: string;
-    title: string;
-    description: string;
-    price: number;
-  }
+
   
   export interface MenuSubcategory {
     id?: string;
@@ -69,13 +50,7 @@ export interface MenuItem {
     items?: Map<string, MenuItem>;
   }
   
-  export interface MenuCategory {
-    id?: string;
-    title: string;
-    description?: string;
-    items: Map<string, MenuSubcategory>;
-  }
-  
+ 
   export interface MessageButton {
     id: string;
     title: string;
@@ -97,6 +72,53 @@ export interface MenuItem {
   }
 
   // Interface for incoming WhatsApp message
+
+
+  export interface MenuItem {
+    id: string;
+    title: string;
+    description: string;
+    price: number;
+    allergens: string[];
+    hasCustomOptions: boolean;
+  }
+  
+  export interface MenuCategory {
+    id: string;
+    name: string;
+    description: string;
+    items: MenuItem[];
+  }
+  
+  export interface Cart {
+    items: CartItem[];
+    total: number;
+    totalAmount: number;
+    subtotal: number;
+    tax: number;
+    discounts: Discount[];
+  }
+  
+  export interface CartItem {
+    id: string;
+    name: string;
+    price: number;
+    quantity: number;
+    specialInstructions: string;
+  }
+  
+  export interface Discount {
+    code: string;
+    amount: number;
+    type: string;
+    value: number;
+  }
+  
+  export interface MessageButton {
+    id: string;
+    title: string;
+  }
+  
   export interface WhatsAppMessage {
     text?: {
       body: string;
@@ -118,4 +140,36 @@ export interface MenuItem {
       address?: string;
     };
   }
-  
+
+  // ../data/types.ts
+
+export type OrderFlow = "browsing" | "checkout" | "order_placed";
+
+export type OrderStep =
+  | "main_menu"
+  | "category"
+  | "item_list"
+  | "location_input"
+  | "specials"
+  | "selecting_delivery_type"
+  | "selecting_payment"
+  | "confirming_order";
+
+export interface UserState {
+  flow: OrderFlow;
+  step: OrderStep;
+  currentCategory: string | null;
+  currentSubcategory: string | null;
+  selectedItems: any[]; // Replace 'any' with the actual type
+  paymentMethod: string | null;
+  deliveryAddress: string | null;
+  deliveryType: "pickup" | "delivery" | null;
+  lastInteractionAt: number;
+  hasDeliveryAddress?: boolean;
+  locationCoordinates?: {
+    longitude: number
+    latitude: number
+  }
+}
+
+// ... other interfaces and types ...

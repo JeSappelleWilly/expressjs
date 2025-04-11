@@ -16,8 +16,7 @@ async function startServer() {
   try {
     // Connect to Redis
     console.log("Connected to Redis successfully");
-    
-    
+    const redis = await RedisClient.getInstance(REDIS_URL);
     // Webhook verification endpoint
     app.get("/*", (req, res) => {
       // Parse the query params
@@ -92,7 +91,6 @@ async function startServer() {
             console.log("Received message without ID, skipping");
             return res.status(200).send('OK');
         }
-        const redis = await RedisClient.getInstance(REDIS_URL);
         const handler = new WhatsAppHandler(redis);
         await handler.handleIncomingMessage(message, sender);      
        

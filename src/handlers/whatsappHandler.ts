@@ -6,6 +6,7 @@ import { WhatsAppMessage } from "../data/types";
 import { CartService } from "../services/cartService";
 import { MenuService } from "../services/menuService";
 import { CheckoutService } from "../services/checkoutService";
+import Redis from "ioredis";
 
 export class WhatsAppHandler {
   private userStateService: UserStateService;
@@ -14,15 +15,16 @@ export class WhatsAppHandler {
   private cartService: CartService;
   private checkoutService: CheckoutService;
   
-  constructor(redisUrl?: string) {
-    this.userStateService = new UserStateService(redisUrl);
+  constructor(redisClient: Redis) {
+    this.userStateService = new UserStateService(redisClient);
     this.whatsAppService = new WhatsAppService();
-    this.cartService = new CartService(this.whatsAppService, redisUrl);
+    this.cartService = new CartService(this.whatsAppService, redisClient);
     this.menuService = new MenuService(this.whatsAppService, this.cartService);
     this.checkoutService = new CheckoutService(
       this.userStateService,
       this.cartService,
-      this.whatsAppService
+      this.whatsAppService,
+      redisClient
     );
   }
 

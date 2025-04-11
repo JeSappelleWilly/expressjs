@@ -181,9 +181,7 @@ export class MenuService {
      */
     async sendWelcomeWithButtons(sender: string): Promise<void> {
         try {
-            const welcomeText = "👋 Welcome to our Restaurant!\n\n" +
-                "We're delighted to serve you through WhatsApp. " +
-                "What would you like to do today?";
+            const welcomeText = "👋 Welcome to our Restaurant! We're delighted to serve you through WhatsApp. What would you like to do today? ";
                 const footer = "Lucky Shrub: Your gateway to succulents!™"
 
             await this.whatsAppService.sendMessage(

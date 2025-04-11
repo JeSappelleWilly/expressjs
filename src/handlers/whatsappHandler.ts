@@ -9,7 +9,6 @@ import { CheckoutService } from "../services/checkoutService";
 import Redis from "ioredis";
 
 export class WhatsAppHandler {
-
   private userStateService: UserStateService;
   private whatsAppService: WhatsAppService;
   private menuService: MenuService;

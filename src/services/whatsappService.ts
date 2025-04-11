@@ -36,6 +36,7 @@ export class WhatsAppService {
         
         return response.json();
       } catch (error) {
+        console.warn('Error sending WhatsApp payload:', payload);
         console.error('Error sending WhatsApp message:', error);
         throw error;
       }

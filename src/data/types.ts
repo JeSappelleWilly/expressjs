@@ -15,6 +15,82 @@ export interface CustomerLocation {
   latitude: number;
 }
 
+
+// Template parameter types
+export type TextParameter = {
+  type: 'text';
+  text: string;
+};
+
+export type CurrencyParameter = {
+  type: 'currency';
+  currency: {
+    fallback_value: string;
+    code: string;
+    amount_1000: number;
+  };
+};
+
+export type DateTimeParameter = {
+  type: 'date_time';
+  date_time: {
+    fallback_value: string;
+  };
+};
+
+export type ImageParameter = {
+  type: 'image';
+  image: {
+    link: string;
+  };
+};
+
+export type VideoParameter = {
+  type: 'video';
+  video: {
+    link: string;
+  };
+};
+
+export type DocumentParameter = {
+  type: 'document';
+  document: {
+    link: string;
+    filename?: string;
+  };
+};
+
+// Union type for all possible parameter types
+type TemplateParameter = 
+  | TextParameter 
+  | CurrencyParameter 
+  | DateTimeParameter 
+  | ImageParameter 
+  | VideoParameter 
+  | DocumentParameter;
+
+// Define TypeScript interfaces for better type safety
+export interface WhatsAppTemplateParams {
+  templateName: string;
+  languageCode: string;
+  headerParameter?: TemplateParameter;
+  bodyParameters?: TemplateParameter[];
+  buttonPayloads?: string[];
+}
+
+
+
+export interface WhatsAppMessageResponse {
+  messaging_product: string;
+  contacts: Array<{
+    input: string;
+    wa_id: string;
+  }>;
+  messages: Array<{
+    id: string;
+  }>;
+}
+
 interface Address {
   street: string;
   city: string;

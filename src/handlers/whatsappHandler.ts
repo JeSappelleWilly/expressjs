@@ -6,17 +6,22 @@ import { WhatsAppMessage } from "../data/types";
 import { CartService } from "../services/cartService";
 import { MenuService } from "../services/menuService";
 import { CheckoutService } from "../services/checkoutService";
+
 import Redis from "ioredis";
 
 export class WhatsAppHandler {
+
   private userStateService: UserStateService;
   private whatsAppService: WhatsAppService;
   private menuService: MenuService;
   private cartService: CartService;
   private checkoutService: CheckoutService;
+  private verifyToken: string;
   
-  constructor(redisClient: Redis) {
+  constructor(redisClient: Redis, verifyToken: string) {
     this.userStateService = new UserStateService(redisClient);
+    this.verifyToken = verifyToken;
+
     this.whatsAppService = new WhatsAppService();
     this.cartService = new CartService(this.whatsAppService, redisClient);
     this.menuService = new MenuService(this.whatsAppService, this.cartService);
@@ -27,6 +32,88 @@ export class WhatsAppHandler {
       redisClient
     );
   }
+
+
+  verify = (req:any, res:any) => {
+    const mode = req.query["hub.mode"];
+    const token = req.query["hub.verify_token"];
+    const challenge = req.query["hub.challenge"];
+
+    if (mode && token) {
+      if (mode === "subscribe" && token === this.verifyToken) {
+        console.log("WEBHOOK_VERIFIED");
+        res.status(200).send(challenge);
+      } else {
+        res.sendStatus(403);
+      }
+    }
+  };
+
+  async process(req:any, res:any) {
+    try {
+      console.log("-------------- New Webhook POST --------------");
+      console.log("Headers:", JSON.stringify(req.headers, null, 3));
+      console.log("Body:", JSON.stringify(req.body, null, 3));
+      
+      // Check if there are entries in the webhook payload
+      if (!req.body?.entry || req.body.entry.length === 0) {
+          return res.status(200).send('OK');
+      }
+
+      const firstEntry = req.body.entry[0];
+      if (!firstEntry?.changes || firstEntry.changes.length === 0) {
+          return res.status(200).send('OK');
+      }
+
+      const change = firstEntry.changes[0];
+      const value = change?.value;
+      
+      // Check if this is a WhatsApp message
+      if (value?.messaging_product !== "whatsapp") {
+          return res.status(200).send('OK');
+      }
+
+      // Extract message data
+      const metadata = value?.metadata || {};
+      const contacts = value?.contacts || [];
+      const messages = value?.messages || [];
+      
+      if (messages.length === 0 || contacts.length === 0) {
+          return res.status(200).send('OK');
+      }
+
+      const message = messages[0];
+      const sender = contacts[0]?.wa_id;
+      const userProfile = contacts[0]?.profile?.name;
+      
+      console.log(`Received message from ${userProfile} (${sender})`);
+        
+      // Skip if no message ID (should not happen with WhatsApp API)
+      if (!message.id) {
+          console.log("Received message without ID, skipping");
+          return res.status(200).send('OK');
+      }
+     
+      await this.handleIncomingMessage(message, sender);      
+     
+      
+      // Log information about the new message
+      console.log(`Processing new message from ${userProfile} (${sender})`);
+      console.log(`Message ID: ${message.id}, Timestamp: ${message.timestamp}`);
+
+             
+      // Log information about the new message
+      console.log(`Processing new message from ${userProfile} (${sender})`);
+      console.log(`Message ID: ${message.id}, Timestamp: ${message.timestamp}`);
+
+
+      res.status(200).send('OK');
+    } catch (error) {
+      console.error('Error processing webhook:', error);
+      res.status(200).send('OK'); // Always return 200 to acknowledge receipt
+    }
+  }
+  
 
   /**
    * Main entry point for handling incoming WhatsApp messages

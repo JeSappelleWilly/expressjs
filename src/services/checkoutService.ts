@@ -3,9 +3,7 @@ import { CartService } from "./cartService";
 import { UserStateService } from "./userStateService";
 import { WhatsAppService } from "./whatsappService";
 import { MessageFactory } from "./messageFactory";
-import { RedisClient } from "./redisClient";
 import Redis from "ioredis";
-import { Order } from "../data/types";
 
 /**
  * Service for managing the checkout process
@@ -29,12 +27,12 @@ export class CheckoutService {
         userStateService: UserStateService, 
         cartService: CartService, 
         whatsAppService: WhatsAppService,
-        redisUrl?: string
+        redisClient: Redis
     ) {
         this.userStateService = userStateService;
         this.cartService = cartService;
         this.whatsAppService = whatsAppService;
-        this.redisClient = RedisClient.getInstance(redisUrl);
+        this.redisClient = redisClient;
     }
     
     /**

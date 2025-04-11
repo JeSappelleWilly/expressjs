@@ -13,7 +13,7 @@ export class CartService {
   private readonly keyPrefix: string = "user:cart:";
   private readonly expiryTime: number = 60 * 60 * 24; // 24 hours in seconds
   private whatsAppService: WhatsAppService;
-   
+  
   /**
    * Creates a new CartService
    * @param whatsAppService The WhatsApp service for sending messages
@@ -313,9 +313,19 @@ export class CartService {
           headerContent: "🛒 Cart Options",
           bodyText: "What would you like to do with your cart?",
           buttons: [
-            { id: "checkout", title: "Checkout" },
-            { id: "main-menu", title: "Continue Shopping" },
-            { id: "cancel-order", title: "Clear Cart" }
+
+            {
+              reply: { id: "checkout", title: "Checkout" },
+              type: "reply"
+            },
+            {
+              reply: { id: "main-menu", title: "Continue Shopping" },
+              type: "reply"
+            },
+            {
+              reply: { id: "cancel-order", title: "Clear Cart" },
+              type: "reply"
+            }
           ]
         })
       );
@@ -347,8 +357,14 @@ export class CartService {
           headerContent: `✏️ Customize ${menuItem.title}`,
           bodyText: "Would you like to add any special instructions for this item?",
           buttons: [
-            { id: "add-instructions", title: "Add Instructions" },
-            { id: "confirm-customization", title: "Add to Cart" }
+            {
+              reply: { id: "add-instructions", title: "Add Instructions" },
+              type: "reply"
+            },
+            {
+              reply: { id: "confirm-customization", title: "Add to Cart" },
+              type: "reply"
+            }
           ]
         })
       );

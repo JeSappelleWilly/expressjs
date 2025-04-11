@@ -175,8 +175,39 @@ export class MenuService {
      */
     async sendWelcomeWithButtons(sender: string): Promise<void> {
         try {
-            await this.whatsAppService.sendWelcomeTemplate(sender, "OGood Food")
-           
+             const welcomeText = "👋 Welcome to our Restaurant!\n\n" +
+                "We're delighted to serve you through WhatsApp. " +
+                "What would you like to do today?";
+                const footer = "Lucky Shrub: Your gateway to succulents!™"
+
+            await this.whatsAppService.sendMessage(
+                MessageFactory.createButtonMessage({
+                    recipient: sender,
+                    headerType: "text",
+                    headerContent: "🍽️ Welcome!",
+                    bodyText: welcomeText,
+                    footerText: footer,
+                    buttons: [
+                        {
+                            type: "reply",
+                            reply: {
+                                id: "main-menu",
+                                title: "Browse Menu"
+                            },
+                        },
+                        {
+                            type: "reply",
+                            reply: { id: "daily-special", title: "Today's Special" }
+                        },
+                        {
+                            type: "reply",
+                            reply: { id: "help", title: "Help" }
+                        },
+                        
+                        
+                    ]
+                })
+            );           
         } catch (error) {
             console.error(`Error sending welcome message to ${sender}:`, error);
             throw error;

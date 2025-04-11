@@ -3,7 +3,7 @@ import { WhatsAppService } from "./whatsappService";
 import { MessageFactory } from "./messageFactory";
 import { findMenuItemById } from "../data/utils";
 import { CartService } from "./cartService";
-import { MenuCategory } from "../data/types";
+import { MenuCategory, WhatsAppTemplateParams } from "../data/types";
 
 /**
  * Service for Menu API
@@ -175,23 +175,8 @@ export class MenuService {
      */
     async sendWelcomeWithButtons(sender: string): Promise<void> {
         try {
-            const welcomeText = "👋 Welcome to our Restaurant!\n\n" +
-                "We're delighted to serve you through WhatsApp. " +
-                "What would you like to do today?";
-                
-            await this.whatsAppService.sendMessage(
-                MessageFactory.createButtonMessage({
-                    recipient: sender,
-                    headerType: "text",
-                    headerContent: "🍽️ Welcome!",
-                    bodyText: welcomeText,
-                    buttons: [
-                        { id: "main-menu", title: "Browse Menu" },
-                        { id: "daily-special", title: "Today's Special" },
-                        { id: "help", title: "Help" }
-                    ]
-                })
-            );
+            await this.whatsAppService.sendWelcomeTemplate(sender, "OGood Food")
+           
         } catch (error) {
             console.error(`Error sending welcome message to ${sender}:`, error);
             throw error;

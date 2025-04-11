@@ -6,8 +6,6 @@ import { WhatsAppMessage } from "../data/types";
 import { CartService } from "../services/cartService";
 import { MenuService } from "../services/menuService";
 import { CheckoutService } from "../services/checkoutService";
-import Express from 'express';
-
 import Redis from "ioredis";
 
 export class WhatsAppHandler {
@@ -17,11 +15,9 @@ export class WhatsAppHandler {
   private menuService: MenuService;
   private cartService: CartService;
   private checkoutService: CheckoutService;
-  private verifyToken: string;
   
-  constructor(redisClient: Redis, verifyToken: string) {
+  constructor(redisClient: Redis) {
     this.userStateService = new UserStateService(redisClient);
-    this.verifyToken = verifyToken;
 
     this.whatsAppService = new WhatsAppService();
     this.cartService = new CartService(this.whatsAppService, redisClient);
@@ -33,23 +29,6 @@ export class WhatsAppHandler {
       redisClient
     );
   }
-
-
-  verify = (req:Express.Request, res:Express.Response) => {
-    const mode = req.query["hub.mode"];
-    const token = req.query["hub.verify_token"];
-    const challenge = req.query["hub.challenge"];
-
-    if (mode && token) {
-      if (mode === "subscribe" && token === this.verifyToken) {
-        console.log("WEBHOOK_VERIFIED");
-        res.status(200).send(challenge);
-      } else {
-        res.sendStatus(403);
-      }
-    }
-  };
-  
 
   /**
    * Main entry point for handling incoming WhatsApp messages

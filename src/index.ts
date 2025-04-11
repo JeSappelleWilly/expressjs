@@ -10,7 +10,6 @@ app.use(express.json());
 
 const VERIFY_TOKEN = process.env.VERIFY_TOKEN || "ceSecret";
 const REDIS_URL = process.env.REDIS_URL;
-const redis = RedisClient.getInstance(REDIS_URL);
 
 // Connect to Redis and start the server
 async function startServer() {

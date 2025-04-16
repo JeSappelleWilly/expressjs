@@ -4,15 +4,16 @@ import { UserStateService } from "./userStateService";
 import { WhatsAppService } from "./whatsappService";
 import { MessageFactory } from "./messageFactory";
 import Redis from "ioredis";
+import { MessageSender } from "whatsapp-cloud-api-express";
 
 /**
  * Service for managing the checkout process
  */
 export class CheckoutService {
     private userStateService: UserStateService;
-    private whatsAppService: WhatsAppService;
     private cartService: CartService;
     private redisClient: Redis;
+    private sender: MessageSender;
     private readonly keyPrefix: string = "user:order:";
     private readonly expiryTime: number = 60 * 60 * 24 * 30; // 30 days in seconds
     
@@ -26,12 +27,12 @@ export class CheckoutService {
     constructor(
         userStateService: UserStateService, 
         cartService: CartService, 
-        whatsAppService: WhatsAppService,
+        sender: MessageSender,
         redisClient: Redis
     ) {
         this.userStateService = userStateService;
         this.cartService = cartService;
-        this.whatsAppService = whatsAppService;
+        this.sender = sender;
         this.redisClient = redisClient;
     }
     
@@ -61,7 +62,7 @@ export class CheckoutService {
             
             // Check if cart is empty
             if (!cart.items || cart.items.length === 0) {
-                await this.whatsAppService.sendText(
+                await this.sender.sendText(
                     sender,
                     "Your cart is empty. Please add items before checkout."
                 );
@@ -69,23 +70,13 @@ export class CheckoutService {
             }
             
             // Send delivery options message
-            await this.whatsAppService.sendMessage(
-                MessageFactory.createButtonMessage({
-                    recipient: sender,
-                    headerType: "text",
-                    headerContent: "🛒 Checkout",
-                    bodyText: "How would you like to receive your order?",
-                    buttons: [
-                        {
-                            reply: { id: "pickup", title: "Pickup" },
-                            type: "reply"
-                        },
-                        {
-                            reply: { id: "delivery", title: "Delivery" },
-                            type: "reply"
-                        },
-                    ]
-                })
+            await this.sender.sendReplyButtons(
+                sender,
+                 "How would you like to receive your order?",
+                {
+                    "pickup" : "Pickup" ,
+                    "delivery": "Delivery",
+                },
             );
             
             // Update user state to checkout flow
@@ -93,7 +84,7 @@ export class CheckoutService {
             
         } catch (error) {
             console.error(`Error initiating checkout for user ${sender}:`, error);
-            await this.whatsAppService.sendText(
+            await this.sender.sendText(
                 sender,
                 "Sorry, we encountered an error while starting checkout. Please try again."
             );
@@ -109,7 +100,7 @@ export class CheckoutService {
             await this.userStateService.setCheckoutInfo(sender, "pickup");
             
             // Send pickup confirmation
-            await this.whatsAppService.sendText(
+            await this.sender.sendText(
                 sender,
                 "You've selected Pickup. Your order will be ready for pickup at our store."
             );
@@ -119,7 +110,7 @@ export class CheckoutService {
             
         } catch (error) {
             console.error(`Error setting up pickup order for user ${sender}:`, error);
-            await this.whatsAppService.sendText(
+            await this.sender.sendText(
                 sender,
                 "Sorry, we encountered an error while processing your pickup selection. Please try again."
             );
@@ -133,26 +124,13 @@ export class CheckoutService {
         try {
             // Update user state
             await this.userStateService.setCheckoutInfo(sender, "delivery");
+            const sections = {
+                    "share-location": "Share Location",
+                    "cancel-checkout": "Cancel"
+                }                        
             
             // Ask for delivery address
-            await this.whatsAppService.sendMessage(
-                MessageFactory.createButtonMessage({
-                    recipient: sender,
-                    headerType: "text",
-                    headerContent: "📍 Delivery Address",
-                    bodyText: "Please share your delivery address. You can either:\n\n1. Type your address\n2. Share your location",
-                    buttons: [
-                        {
-                            reply: { id: "share-location", title: "Share Location" },
-                            type: "reply"
-                        },
-                        {
-                            reply: { id: "cancel-checkout", title: "Cancel" },
-                            type: "reply"
-                        }                        
-                    ]
-                })
-            );
+
             
             // Update user state to address input
             await this.userStateService.updateUserState(sender, {
@@ -161,7 +139,7 @@ export class CheckoutService {
             
         } catch (error) {
             console.error(`Error setting up delivery order for user ${sender}:`, error);
-            await this.whatsAppService.sendText(
+            await this.sender.sendText(
                 sender,
                 "Sorry, we encountered an error while processing your delivery selection. Please try again."
             );
@@ -175,7 +153,7 @@ export class CheckoutService {
         try {
             // Check if address is valid (basic validation)
             if (!address || address.trim().length < 5) {
-                await this.whatsAppService.sendText(
+                await this.sender.sendText(
                     sender,
                     "Please provide a valid address for delivery."
                 );
@@ -186,7 +164,7 @@ export class CheckoutService {
             await this.userStateService.setCheckoutInfo(sender, "delivery", address);
             
             // Confirm address and proceed to payment
-            await this.whatsAppService.sendText(
+            await this.sender.sendText(
                 sender,
                 `Your delivery address has been set to:\n\n${address}`
             );
@@ -196,7 +174,7 @@ export class CheckoutService {
             
         } catch (error) {
             console.error(`Error processing delivery address for user ${sender}:`, error);
-            await this.whatsAppService.sendText(
+            await this.sender.sendText(
                 sender,
                 "Sorry, we encountered an error while saving your address. Please try again."
             );
@@ -229,7 +207,7 @@ export class CheckoutService {
             });
             
             // Confirm location and proceed to payment
-            await this.whatsAppService.sendText(
+            await this.sender.sendText(
                 sender,
                 `Your delivery location has been set to:\n\n${address}`
             );
@@ -239,7 +217,7 @@ export class CheckoutService {
             
         } catch (error) {
             console.error(`Error saving customer location for user ${sender}:`, error);
-            await this.whatsAppService.sendText(
+            await this.sender.sendText(
                 sender,
                 "Sorry, we encountered an error while saving your location. Please try again."
             );
@@ -257,7 +235,7 @@ export class CheckoutService {
     }): Promise<void> {
         try {
             if (!location) {
-                await this.whatsAppService.sendText(
+                await this.sender.sendText(
                     sender,
                     "We couldn't process your location. Please try sharing it again or type your address instead."
                 );
@@ -268,7 +246,7 @@ export class CheckoutService {
             
         } catch (error) {
             console.error(`Error processing delivery location for user ${sender}:`, error);
-            await this.whatsAppService.sendText(
+            await this.sender.sendText(
                 sender,
                 "Sorry, we encountered an error while processing your location. Please try again."
             );
@@ -287,30 +265,22 @@ export class CheckoutService {
             await this.userStateService.updateUserState(sender, {
                 step: "selecting_payment"
             });
+            const sections = [
+                    { id: "cash", title: "Cash on Delivery", description: "Pay when your order arrives" },
+                    { id: "credit-card", title: "Credit Card", description: "Pay securely online" },
+                    { id: "mobile-payment", title: "Mobile Payment", description: "Pay using mobile payment apps" }
+            ];
             
             // Send payment options
-            await this.whatsAppService.sendMessage(
-                MessageFactory.createListMessage({
-                    recipient: sender,
-                    headerText: "💳 Payment Method",
-                    bodyText: "Please select your preferred payment method:",
-                    buttonText: "Payment Options",
-                    sections: [
-                        {
-                            title: "Available Methods",
-                            rows: [
-                                { id: "cash", title: "Cash on Delivery", description: "Pay when your order arrives" },
-                                { id: "credit-card", title: "Credit Card", description: "Pay securely online" },
-                                { id: "mobile-payment", title: "Mobile Payment", description: "Pay using mobile payment apps" }
-                            ]
-                        }
-                    ]
-                })
-            );
+            await this.sender.sendList(
+                    sender, "Submit", "Please select your preferred payment method:", 
+                    { "Payment Options": sections}
+                )
+            
             
         } catch (error) {
             console.error(`Error sending payment options to user ${sender}:`, error);
-            await this.whatsAppService.sendText(
+            await this.sender.sendText(
                 sender,
                 "Sorry, we encountered an error while processing payment options. Please try again."
             );
@@ -348,7 +318,7 @@ export class CheckoutService {
             await this.userStateService.setPaymentMethod(sender, paymentMethod);
             
             // Confirm payment method selection
-            await this.whatsAppService.sendText(
+            await this.sender.sendText(
                 sender,
                 `You've selected ${paymentDescription} as your payment method.`
             );
@@ -356,7 +326,7 @@ export class CheckoutService {
             // For credit card or mobile payment, we would typically redirect to payment gateway
             // For this example, we'll just proceed to order confirmation
             if (paymentMethod === "credit_card" || paymentMethod === "mobile_payment") {
-                await this.whatsAppService.sendText(
+                await this.sender.sendText(
                     sender,
                     "For this demo, we'll simulate payment completion automatically."
                 );
@@ -367,7 +337,7 @@ export class CheckoutService {
             
         } catch (error) {
             console.error(`Error processing payment method for user ${sender}:`, error);
-            await this.whatsAppService.sendText(
+            await this.sender.sendText(
                 sender,
                 "Sorry, we encountered an error while processing your payment selection. Please try again."
             );
@@ -429,32 +399,19 @@ export class CheckoutService {
             summaryText += "Please confirm your order or make changes.";
             
             // Send summary
-            await this.whatsAppService.sendText(sender, summaryText);
+            await this.sender.sendText(sender, summaryText);
             
             // Send confirmation buttons
-            await this.whatsAppService.sendMessage(
-                MessageFactory.createButtonMessage({
-                    recipient: sender,
-                    headerType: "text",
-                    headerContent: "Confirm Your Order",
-                    bodyText: "Would you like to place this order now?",
-                    buttons: [
+            await this.sender.sendReplyButtons( sender,  "Would you like to place this order now?", 
                         {
-                            reply: { id: "confirm-order", title: "Place Order" },
-                            type: "reply"
-                        },
-                        {
-                            reply: { id: "cancel-order", title: "Cancel" },
-                            type: "reply"
-                        },
-                        
-                    ]
-                })
+                        "confirm-order": "Place Order" ,
+                        "cancel-order": "Cancel",
+                }
             );
             
         } catch (error) {
             console.error(`Error sending order summary for user ${sender}:`, error);
-            await this.whatsAppService.sendText(
+            await this.sender.sendText(
                 sender,
                 "Sorry, we encountered an error while creating your order summary. Please try again."
             );
@@ -501,7 +458,7 @@ export class CheckoutService {
             );
             
             // Send confirmation message
-            await this.whatsAppService.sendText(
+            await this.sender.sendText(
                 sender,
                 `✅ *Order Confirmed!*\n\nYour order #${orderId} has been received and is being processed.\n\n${
                     order.deliveryType === "delivery" 
@@ -517,29 +474,21 @@ export class CheckoutService {
             await this.userStateService.resetState(sender);
             
             // Send return to menu button
-            await this.whatsAppService.sendMessage(
-                MessageFactory.createButtonMessage({
-                    recipient: sender,
-                    headerType: "text",
-                    headerContent: "What would you like to do next?",
-                    bodyText: "You can place another order or check your order status.",
-                    buttons: [
-                        {
-                            reply: { id: "main-menu", title: "Return to Menu" },
-                            type: "reply"
-                        },
-                        {
-                            reply: { id: "my-orders", title: "My Orders" },
-                            type: "reply"
-                        },
-                        
-                    ]
-                })
-            );
+            await this.sender.sendReplyButtons(sender,"You can place another order or check your order status.", 
+                {
+                    "main-menu": "Return to Menu",
+                    "my-orders": "My Orders",
+                },
+                    {
+                        header: {
+                            type: "text",
+                            text: "What would you like to do next?"
+                        }
+                    })        
             
         } catch (error) {
             console.error(`Error confirming final order for user ${sender}:`, error);
-            await this.whatsAppService.sendText(
+            await this.sender.sendText(
                 sender,
                 "Sorry, we encountered an error while processing your order. Please try again."
             );
@@ -586,35 +535,25 @@ export class CheckoutService {
             await this.userStateService.resetState(sender);
             
             // Send cancellation confirmation
-            await this.whatsAppService.sendText(
+            await this.sender.sendText(
                 sender,
                 "Your order has been cancelled. Your cart items have been saved for later."
             );
             
             // Send return to menu button
-            await this.whatsAppService.sendMessage(
-                MessageFactory.createButtonMessage({
-                    recipient: sender,
-                    headerType: "text",
-                    headerContent: "What would you like to do next?",
-                    bodyText: "You can continue shopping or view your cart.",
-                    buttons: [
+            await this.sender.sendReplyButtons(
+                    sender,
+                    "You can continue shopping or view your cart.",
                         {
-                            reply: { id: "main-menu", title: "Main Menu" },
-                            type: "reply"
+                         "main-menu": "Main Menu",
+                         "view-cart": "View Cart",
                         },
-                        {
-                            reply: { id: "view-cart", title: "View Cart" },
-                            type: "reply"
-                        },
-                        
-                    ]
-                })
-            );
+                )
+            
             
         } catch (error) {
             console.error(`Error cancelling order for user ${sender}:`, error);
-            await this.whatsAppService.sendText(
+            await this.sender.sendText(
                 sender,
                 "Sorry, we encountered an error while cancelling your order. Please try again."
             );

@@ -1,157 +1,110 @@
 import express from "express";
-import Redis from "ioredis";
 import { RedisClient } from "./services/redisClient";
-import { WhatsAppHandler } from "./handlers/whatsappHandler";
+import { createMessageSender, getWebhookRouter, Message } from "whatsapp-cloud-api-express";
+
+// Initialize services
+const redis = new RedisClient();
+import Redis from 'ioredis';
+import { UserStateService } from './services/userStateService';
+import { CartService } from './services/cartService';
+import { MenuService } from './services/menuService';
+import { CheckoutService } from './services/checkoutService';
+import { Status } from "whatsapp-cloud-api-express/lib/createBot.types";
 
 const app = express();
-const port = process.env.PORT || 3333;
+const port = process.env.PORT || 3000;
 
-app.use(express.json());
+// Create Redis client
+const redisClient = new Redis(process.env.REDIS_URL || '');
 
-// Redis client initialization
-// Redis client with proper error handling
+// Create WhatsApp sender
+const sender = createMessageSender(
+  process.env.NUMBER_ID || '',
+  process.env.ACCESS_TOKEN || ''
+);
 
+// Create services
+const userStateService = new UserStateService(redisClient);
+const cartService = new CartService(sender, redisClient);
+const menuService = new MenuService(sender, cartService);
+const checkoutService = new CheckoutService(
+  userStateService,
+  cartService,
+  sender,
+  redisClient
+);
 
-
-// Constants
-const VERIFY_TOKEN = process.env.VERIFY_TOKEN || "ceSecret";
-const REDIS_URL = process.env.REDIS_URL || "rediss://";
-
-// Store processed message IDs with timestamps (kept in memory for duplicate detection)
-
-// Connect to Redis and start the server
-async function startServer() {
+// Handle incoming WhatsApp messages
+async function onNewMessage(message: Message) {
   try {
-    // Connect to Redis
-    console.log("Connected to Redis successfully");
-    const redis = await RedisClient.getInstance(REDIS_URL);
+    const sender = message.from;
+    const userState = await userStateService.getUserState(sender);
     
-    // Webhook verification endpoint
-    app.get("/*", (req, res) => {
-      // Parse the query params
-      const mode = req.query["hub.mode"];
-      const token = req.query["hub.verify_token"];
-      const challenge = req.query["hub.challenge"];
-
-      console.log("-------------- New Request GET --------------");
-      console.log("Headers:", JSON.stringify(req.headers, null, 3));
-      console.log("Body:", JSON.stringify(req.body, null, 3));
-
-      // Check if a token and mode is in the query string of the request
-      if (mode && token) {
-        // Check the mode and token sent is correct
-        if (mode === "subscribe" && token === VERIFY_TOKEN) {
-          // Respond with the challenge token from the request
-          console.log("WEBHOOK_VERIFIED");
-          res.status(200).send(challenge);
-        } else {
-          console.log("Responding with 403 Forbidden");
-          // Respond with '403 Forbidden' if verify tokens do not match
-          res.sendStatus(403);
-        }
+    // Process based on message type
+    if (message.type === 'interactive' && message.data.interactive?.list_reply) {
+      const selectedId = message.data.interactive.list_reply.id;
+      
+      if (selectedId.startsWith("payment")) {
+        await checkoutService.processPaymentMethod(sender, selectedId);
       } else {
-        console.log("Replying Thank you.");
-        res.json({ message: "Thank you for the message" });
+        await cartService.addItemToCart(sender, selectedId);
+        await cartService.sendCartSummary(sender);
       }
-    });
-
-    // Webhook for handling incoming messages
-    app.post("/", async (req, res) => {
-      try {
-        console.log("-------------- New Webhook POST --------------");
-        console.log("Headers:", JSON.stringify(req.headers, null, 3));
-        console.log("Body:", JSON.stringify(req.body, null, 3));
-        
-        // Check if there are entries in the webhook payload
-        if (!req.body?.entry || req.body.entry.length === 0) {
-            return res.status(200).send('OK');
-        }
-
-        const firstEntry = req.body.entry[0];
-        if (!firstEntry?.changes || firstEntry.changes.length === 0) {
-            return res.status(200).send('OK');
-        }
-
-        const change = firstEntry.changes[0];
-        const value = change?.value;
-        
-        // Check if this is a WhatsApp message
-        if (value?.messaging_product !== "whatsapp") {
-            return res.status(200).send('OK');
-        }
-
-        // Extract message data
-        const contacts = value?.contacts || [];
-        const messages = value?.messages || [];
-        
-        if (messages.length === 0 || contacts.length === 0) {
-            return res.status(200).send('OK');
-        }
-
-        const message = messages[0];
-        const sender = contacts[0]?.wa_id;
-        const userProfile = contacts[0]?.profile?.name;
-        
-        console.log(`Received message from ${userProfile} (${sender})`);
-          
-        // Skip if no message ID (should not happen with WhatsApp API)
-        if (!message.id) {
-            console.log("Received message without ID, skipping");
-            return res.status(200).send('OK');
-        }
-        
-        // Check if this message has been processed already (using Redis)
-        const messageKey = `processed:${message.id}`;
-        
+    } else if (message.type === 'interactive' && message.data.interactive?.button_reply) {
+      const buttonId = message.data.interactive.button_reply.id;
       
-       
-        
-        // Log information about the new message
-        console.log(`Processing new message from ${userProfile} (${sender})`);
-        console.log(`Message ID: ${message.id}, Timestamp: ${message.timestamp}`);
-
-               
-        // Log information about the new message
-        console.log(`Processing new message from ${userProfile} (${sender})`);
-        console.log(`Message ID: ${message.id}, Timestamp: ${message.timestamp}`);
-        const handler = new WhatsAppHandler(redis);
-        // Store this message ID in Redis to prevent reprocessing
-        // Set expiration to 24 hours (86400 seconds)
-      
-        // Handle different message types
-        await handler.handleIncomingMessage(message, sender);
-
-        res.status(200).send('OK');
-      } catch (error) {
-        console.error('Error processing webhook:', error);
-        res.status(200).send('OK'); // Always return 200 to acknowledge receipt
+      // Handle button press based on ID
+      if (buttonId === "main-menu") {
+        await menuService.sendMainMenu(sender);
+      } else if (buttonId === "view-cart") {
+        await cartService.sendCartSummary(sender);
+      } else if (buttonId === "checkout") {
+        await checkoutService.initiateCheckout(sender);
       }
-    });
-
-    // Start the server
-    app.listen(port, () => {
-      console.log(`Listening at http://localhost:${port}`);
-    });
-    
+      // ... other button handling logic
+    } else if (message.type === 'text') {
+      const text = message.data.text.body.toLowerCase();
+      
+      // Handle text commands
+      if (text === "menu") {
+        await menuService.sendMainMenu(sender);
+      } else if (text === "cart") {
+        await cartService.sendCartSummary(sender);
+      }
+      // ... other text handling logic
+    } else if (message.type === 'location') {
+      await checkoutService.processDeliveryLocation(sender, message.data.location);
+    }
+    // ... handle other message types
   } catch (error) {
-    console.error("Failed to connect to Redis:", error);
-    process.exit(1);
+    console.error('Error handling message:', error);
+    // Send error message to user
+    await sender.sendText(
+      message.from,
+      "Sorry, we experienced an issue processing your request. Please try again."
+    );
   }
 }
 
+// Optional status change handler
+async function onStatusChange(status: Status) {
+  console.log('Message status changed:', status);
+  // You could update order status or track message delivery here
+}
 
-// Handle graceful shutdown
-process.on('SIGINT', async () => {
-  console.log('Shutting down server...');
-  try {
-    await RedisClient.close();
-    console.log('Redis connection closed');
-    process.exit(0);
-  } catch (err) {
-    console.error('Error during shutdown:', err);
-    process.exit(1);
-  }
+// Mount the webhook router
+app.use(
+  '/',
+  getWebhookRouter({
+    webhookVerifyToken: process.env.WEBHOOK_VERIFY_TOKEN || 'ceSecret',
+    onNewMessage,
+    appSecret: process.env.FACEBOOK_APP_SECRET!, // Optional but recommended
+    onStatusChange, // Optional
+    logAllEntrantRequests: process.env.NODE_ENV !== 'production', // Optional, log in development
+  })
+);
+
+// Start server
+app.listen(port, () => {
+  console.log(`Server running on port ${port}`);
 });
-
-// Start the server
-startServer();

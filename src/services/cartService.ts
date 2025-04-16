@@ -1,9 +1,9 @@
 // services/cartService.ts
-import { WhatsAppService } from "./whatsappService";
 import { MessageFactory } from "./messageFactory";
 import { findMenuItemById } from "../data/utils";
 import Redis from "ioredis";
 import { Cart, CartItem } from "../data/types";
+import { MessageSender } from "whatsapp-cloud-api-express";
 
 /**
  * Manages shopping cart operations using Redis
@@ -12,15 +12,15 @@ export class CartService {
   private redisClient: Redis;
   private readonly keyPrefix: string = "user:cart:";
   private readonly expiryTime: number = 60 * 60 * 24; // 24 hours in seconds
-  private whatsAppService: WhatsAppService;
+  private sender: MessageSender;
   
   /**
    * Creates a new CartService
    * @param whatsAppService The WhatsApp service for sending messages
    * @param redisUrl Redis connection URL (optional)
    */
-  constructor(whatsAppService: WhatsAppService, redisClient: Redis) {
-    this.whatsAppService = whatsAppService;
+  constructor(sender: MessageSender, redisClient: Redis) {
+    this.sender = sender;
     this.redisClient = redisClient;
   }
   
@@ -270,7 +270,7 @@ export class CartService {
       const cart = await this.getCart(userId);
       
       if (!cart.items.length) {
-        await this.whatsAppService.sendText(
+        await this.sender.sendText(
           userId, 
           "Your cart is empty. Please add items before checkout."
         );
@@ -303,32 +303,19 @@ export class CartService {
       summaryText += `*Total:* $${cart.total.toFixed(2)}\n`;
       
       // Send the cart summary
-      await this.whatsAppService.sendText(userId, summaryText);
+      await this.sender.sendText(userId, summaryText);
       
       // Send cart action buttons
-      await this.whatsAppService.sendMessage(
-        MessageFactory.createButtonMessage({
-          recipient: userId,
-          headerType: "text",
-          headerContent: "🛒 Cart Options",
-          bodyText: "What would you like to do with your cart?",
-          buttons: [
-
-            {
-              reply: { id: "checkout", title: "Checkout" },
-              type: "reply"
-            },
-            {
-              reply: { id: "main-menu", title: "Continue Shopping" },
-              type: "reply"
-            },
-            {
-              reply: { id: "cancel-order", title: "Clear Cart" },
-              type: "reply"
-            }
-          ]
-        })
-      );
+      await this.sender.sendReplyButtons(
+          userId,
+      
+          "What would you like to do with your cart?",
+          {
+            "checkout": "Checkout",
+            "main-menu": "Continue Shopping",
+            "cancel-order": "Clear Cart"
+          },          
+        );
     } catch (error) {
       console.error(`Error sending cart summary for user ${userId}:`, error);
       throw error;
@@ -350,24 +337,13 @@ export class CartService {
       // and send appropriate interactive messages
       
       // For this example, we'll just prompt for special instructions
-      await this.whatsAppService.sendMessage(
-        MessageFactory.createButtonMessage({
-          recipient: userId,
-          headerType: "text",
-          headerContent: `✏️ Customize ${menuItem.title}`,
-          bodyText: "Would you like to add any special instructions for this item?",
-          buttons: [
+      await this.sender.sendReplyButtons(
+        userId, "Would you like to add any special instructions for this item?",
             {
-              reply: { id: "add-instructions", title: "Add Instructions" },
-              type: "reply"
-            },
-            {
-              reply: { id: "confirm-customization", title: "Add to Cart" },
-              type: "reply"
-            }
-          ]
-        })
-      );
+              "add-instructions": "Add Instructions",
+              "confirm-customization": "Add to Cart"
+            },          
+        );
     } catch (error) {
       console.error(`Error starting customization for item ${itemId} for user ${userId}:`, error);
       throw error;

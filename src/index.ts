@@ -1,6 +1,5 @@
 import express from "express";
 import { RedisClient } from "./services/redisClient";
-import { createMessageSender, getWebhookRouter, Message } from "whatsapp-cloud-api-express";
 
 // Initialize services
 const redis = new RedisClient();
@@ -9,7 +8,8 @@ import { UserStateService } from './services/userStateService';
 import { CartService } from './services/cartService';
 import { MenuService } from './services/menuService';
 import { CheckoutService } from './services/checkoutService';
-import { Status } from "whatsapp-cloud-api-express/lib/createBot.types";
+import { createMessageSender, Message, Status } from "./types/bot";
+import { getWebhookRouter } from "./types/router";
 
 const app = express();
 const port = process.env.PORT || 3000;
@@ -78,7 +78,7 @@ async function onNewMessage(message: Message) {
     // ... handle other message types
   } catch (error) {
     console.error('Error handling message:', error);
-    // Send error message to user
+    // Send error message tfo user
     await sender.sendText(
       message.from,
       "Sorry, we experienced an issue processing your request. Please try again."

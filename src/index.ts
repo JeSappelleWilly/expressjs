@@ -8,8 +8,9 @@ import { UserStateService } from './services/userStateService';
 import { CartService } from './services/cartService';
 import { MenuService } from './services/menuService';
 import { CheckoutService } from './services/checkoutService';
-import { createMessageSender, Message, Status } from "./types/bot";
+import { Message, Status } from "./types/bot";
 import { getWebhookRouter } from "./types/router";
+import { createMessageSender } from "./types/createbot";
 
 const app = express();
 const port = process.env.PORT || 3000;

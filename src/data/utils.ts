@@ -1,6 +1,9 @@
 import { findAllMenuItems, menuCategories } from "./db";
 import { MenuItem } from "./types";
 
+export interface FreeFormObject {
+  [key: string]: any;
+}
 
 /**
  * Finds a menu item by its ID across all categories

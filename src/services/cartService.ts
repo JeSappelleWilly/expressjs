@@ -3,7 +3,7 @@ import { MessageFactory } from "./messageFactory";
 import { findMenuItemById } from "../data/utils";
 import Redis from "ioredis";
 import { Cart, CartItem } from "../data/types";
-import { MessageSender } from "whatsapp-cloud-api-express";
+import { MessageSender } from "../types/bot";
 
 /**
  * Manages shopping cart operations using Redis

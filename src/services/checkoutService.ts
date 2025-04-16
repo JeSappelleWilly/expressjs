@@ -4,7 +4,7 @@ import { UserStateService } from "./userStateService";
 import { WhatsAppService } from "./whatsappService";
 import { MessageFactory } from "./messageFactory";
 import Redis from "ioredis";
-import { MessageSender } from "whatsapp-cloud-api-express";
+import { MessageSender } from "../types/bot";
 
 /**
  * Service for managing the checkout process

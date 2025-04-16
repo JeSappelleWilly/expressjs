@@ -1,4 +1,5 @@
-import { createMessageSender, MessageSender } from "../types/bot";
+import { MessageSender } from "../types/bot";
+import { createMessageSender } from "../types/createbot";
 import { SendMessageResult, sendRequestHelper } from "../types/request";
 
 export class WhatsAppService {

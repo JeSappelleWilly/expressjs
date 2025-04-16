@@ -1,5 +1,5 @@
-import { createMessageSender, MessageSender } from "whatsapp-cloud-api-express";
-import { SendMessageResult, sendRequestHelper } from "whatsapp-cloud-api-express/lib/sendRequestHelper";
+import { createMessageSender, MessageSender } from "../types/bot";
+import { SendMessageResult, sendRequestHelper } from "../types/request";
 
 export class WhatsAppService {
   private sendRequest: <T>(data: T) => Promise<SendMessageResult>;

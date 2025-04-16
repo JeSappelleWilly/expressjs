@@ -1,5 +1,5 @@
 // services/menuService.ts
-import { MessageSender } from 'whatsapp-cloud-api-express';
+import { MessageSender } from "../types/bot";
 import { CartService } from './cartService';
 
 export class MenuService {

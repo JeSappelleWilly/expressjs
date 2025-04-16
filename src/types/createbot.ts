@@ -1,7 +1,7 @@
 import isURL from 'validator/lib/isURL';
-import { sendRequestHelper } from './request';
 import { ICreateMessageSender } from './bot';
 import { MediaBase, TextMessage, ReactionMessage, MediaMessage, LocationMessage, TemplateMessage, ContactMessage, InteractiveMessage, ProductMessage, ProductListMessage, CatalogMessage } from './message';
+import { sendRequestHelper } from './helper';
 
 
 interface PayloadBase {

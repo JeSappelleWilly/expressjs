@@ -79,30 +79,24 @@ export class CartService {
   async addItemToCart(userId: string, itemId: string, quantity: number = 1): Promise<Cart> {
     try {
       const cart = await this.getCart(userId);
-      const existingItemIndex = cart.items.findIndex(item => item.id === itemId);
       
-      // Find the menu item to get details
-      const menuItem = findMenuItemById(itemId);
       
-      if (!menuItem) {
+      if (!itemId) {
         throw new Error(`Item with ID ${itemId} not found in menu`);
       }
       
-      if (existingItemIndex >= 0) {
-        // Update quantity if item already exists
-        cart.items[existingItemIndex].quantity += quantity;
-      } else {
+        
         // Add new item
         const cartItem: CartItem = {
           id: itemId,
-          name: menuItem.title,
-          price: menuItem.price || 0,
+          name: itemId,
+          price: 500,
           quantity: quantity,
           specialInstructions: ""
         };
         
         cart.items.push(cartItem);
-      }
+      
       
       // Recalculate totals
       this.recalculateCartTotals(cart);

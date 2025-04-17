@@ -19,7 +19,7 @@ export class MenuService {
   }
 
   async sendWelcomeWithButtons(recipientPhone: string): Promise<void> {
-    await this.sender.sendTemplate(recipientPhone, "welcome", "en", [
+    await this.sender.sendTemplate(recipientPhone, "welcome_fr", "fr", [
       {
         "type": "header",
         "parameters": [

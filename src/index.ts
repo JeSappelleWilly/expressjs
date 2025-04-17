@@ -82,7 +82,14 @@ async function onNewMessage(message: Message) {
         await checkoutService.initiateCheckout(recipient);
       } else if (buttonId === "help") {
         await menuService.requestSupport(recipient);
+      } else if (buttonId.startsWith("pay")) {
+        await checkoutService.sendPaymentOptions(recipient);
+      } else if (buttonId.startsWith("deliver")) {
+        await checkoutService.sendDeliveryOptions(recipient);
+      } else if (buttonId.startsWith("return")) {
+        await menuService.requestSupport(recipient);
       }
+
       // ... other button handling logic
     } else if (message.type === 'text') {
       console.warn("data", message.data);

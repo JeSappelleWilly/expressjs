@@ -132,7 +132,12 @@ export interface MessageSender {
     sendCatalog: (to: string, bodyText: string, options?: {
         thumbnailProductRetailerId?: string;
         footerText?: string;
-    }) => Promise<SendMessageResult>;
+    }) => Promise<SendMessageResult>;   
+    requestLocation: (to: string, bodyText: string, options?: {
+        footerText?: string;
+        header?: InteractiveHeader;
+        reply?: string;
+    }) => Promise<any>;
 }
 export declare type ICreateMessageSender = (fromPhoneNumberId: string, accessToken: string, 
 /**

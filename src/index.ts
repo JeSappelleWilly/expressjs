@@ -68,6 +68,7 @@ async function onNewMessage(message: Message) {
         await cartService.sendCartSummary(recipient);
       }
     } else if (message.type === 'interactive' && message.data.interactive?.button_reply) {
+      console.warn("reply payload", message.data);
       const buttonId = message.data.interactive.button_reply.id;
       
       // Handle button press based on ID
@@ -77,6 +78,8 @@ async function onNewMessage(message: Message) {
         await cartService.sendCartSummary(recipient);
       } else if (buttonId === "checkout") {
         await checkoutService.initiateCheckout(recipient);
+      } else if (buttonId === "help") {
+        await menuService.requestSupport(recipient);
       }
       // ... other button handling logic
     } else if (message.type === 'text') {

@@ -5,6 +5,14 @@ export interface FreeFormObject {
   [key: string]: any;
 }
 
+
+export const logRequest: RequestHandler = (req, res, next) => {
+  console.log(req.url);
+  if (req.body != null) {
+    console.log(JSON.stringify(req.body));
+  }
+  next();
+};
 /**
  * Finds a menu item by its ID across all categories
  * @param itemId The ID of the menu item to find

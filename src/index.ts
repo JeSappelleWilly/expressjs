@@ -13,6 +13,7 @@ import { createMessageSender } from "./types/createbot";
 import { getWebhookRouter } from "./types/webhook";
 import { IncomingMessage } from 'http';
 import { ServerResponse } from 'http';
+import { sampleItems } from "./types/misc";
 
 const app = express();
 const port = process.env.PORT || 3000;
@@ -43,7 +44,7 @@ const sender = createMessageSender(
 // Create services
 const userStateService = new UserStateService(redisClient);
 const cartService = new CartService(sender, redisClient);
-const menuService = new MenuService(sender, cartService);
+const menuService = new MenuService(sender, cartService, sampleItems);
 const checkoutService = new CheckoutService(
   userStateService,
   cartService,

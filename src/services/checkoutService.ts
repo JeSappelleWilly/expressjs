@@ -284,9 +284,9 @@ export class CheckoutService {
                 step: "selecting_payment"
             });
             const sections = [
-                    { id: "cash", title: "Cash on Delivery", description: "Pay when your order arrives" },
-                    { id: "credit-card", title: "Credit Card", description: "Pay securely online" },
-                    { id: "mobile-payment", title: "Mobile Payment", description: "Pay using mobile payment apps" }
+                    { id: "pay-cash", title: "Cash on Delivery", description: "Pay when your order arrives" },
+                    { id: "pay-credit-card", title: "Credit Card", description: "Pay securely online" },
+                    { id: "pay-mobile-payment", title: "Mobile Payment", description: "Pay using mobile payment apps" }
             ];
             
             // Send payment options

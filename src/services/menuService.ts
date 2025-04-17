@@ -18,9 +18,6 @@ export class MenuService {
     this.categories = sampleCategories;
   }
 
-  /**
-   * Sends welcome message with buttons
-   */
   async sendWelcomeWithButtons(recipientPhone: string): Promise<void> {
     await this.sender.sendTemplate(recipientPhone, "welcome", "en", [
       {
@@ -39,7 +36,8 @@ export class MenuService {
       "parameters": [ 
           {
               "type": "text",
-              "text": "Fockal Food"
+              "text": "Fockal Food",
+              "paramter_name": "restaurant_name"
           }
       ]
     }

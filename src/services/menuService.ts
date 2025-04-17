@@ -56,10 +56,20 @@ export class MenuService {
   async sendMainMenu(recipientPhone: string): Promise<void> {
     const categories = this.getMenuCategories();
     // Build sections as a map: section title -> array of rows
-    const sections: { [sectionTitle: string]: { id: string; title: string; }[] } = {
-      Categories: categories.map(cat => ({ id: cat.id, title: cat.title }))
-    };
-    
+    const sections = {
+      "main" : [
+        {
+          title: "Chicken Wings",
+          id: "wings"
+        }
+    ],
+      "drinks" : [
+        {
+          title: "Wisky",
+          id: "wisky"
+        }
+    ],
+    }
     await this.sender.sendList(
       recipientPhone,
       "Browse Menu",

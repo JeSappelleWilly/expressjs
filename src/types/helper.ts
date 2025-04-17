@@ -36,6 +36,7 @@ export const sendRequestHelper =
   ) =>
   async <T>(data: T): Promise<SendMessageResult> => {
     try {
+        console.warn("payload", data);
       const { data: rawResult } = await axios({
         method: 'post',
         url: `https://graph.facebook.com/${version}/${fromPhoneNumberId}/messages`,

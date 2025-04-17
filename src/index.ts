@@ -90,8 +90,23 @@ async function onNewMessage(message: Message) {
       } else if (buttonId.startsWith("return")) {
         await menuService.requestSupport(recipient);
       }
-
-      // ... other button handling logic
+    } else if (message.type === 'button') {
+        const text = message.data.text.toLowerCase();
+        if (text === "menu") {
+          await menuService.sendMainMenu(recipient);
+        } else if (text === "view-cart") {
+          await cartService.sendCartSummary(recipient);
+        } else if (text === "checkout") {
+          await checkoutService.initiateCheckout(recipient);
+        } else if (text === "help") {
+          await menuService.requestSupport(recipient);
+        } else if (text.startsWith("pay")) {
+          await checkoutService.sendPaymentOptions(recipient);
+        } else if (text.startsWith("deliver")) {
+          await checkoutService.sendDeliveryOptions(recipient);
+        } else if (text.startsWith("return")) {
+          await menuService.requestSupport(recipient);
+        }
     } else if (message.type === 'text') {
       console.warn("data", message.data);
       const text = message.data.text.toLowerCase();

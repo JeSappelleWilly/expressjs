@@ -54,29 +54,29 @@ const checkoutService = new CheckoutService(
 // Handle incoming WhatsApp messages
 async function onNewMessage(message: Message) {
   try {
-    const sender = message.from;
-    const userState = await userStateService.getUserState(sender);
+    const recipient = message.from;
+    const userState = await userStateService.getUserState(recipient);
     
     // Process based on message type
     if (message.type === 'interactive' && message.data.interactive?.list_reply) {
       const selectedId = message.data.interactive.list_reply.id;
       
       if (selectedId.startsWith("payment")) {
-        await checkoutService.processPaymentMethod(sender, selectedId);
+        await checkoutService.processPaymentMethod(recipient, selectedId);
       } else {
-        await cartService.addItemToCart(sender, selectedId);
-        await cartService.sendCartSummary(sender);
+        await cartService.addItemToCart(recipient, selectedId);
+        await cartService.sendCartSummary(recipient);
       }
     } else if (message.type === 'interactive' && message.data.interactive?.button_reply) {
       const buttonId = message.data.interactive.button_reply.id;
       
       // Handle button press based on ID
       if (buttonId === "main-menu") {
-        await menuService.sendMainMenu(sender);
+        await menuService.sendMainMenu(recipient);
       } else if (buttonId === "view-cart") {
-        await cartService.sendCartSummary(sender);
+        await cartService.sendCartSummary(recipient);
       } else if (buttonId === "checkout") {
-        await checkoutService.initiateCheckout(sender);
+        await checkoutService.initiateCheckout(recipient);
       }
       // ... other button handling logic
     } else if (message.type === 'text') {
@@ -85,13 +85,15 @@ async function onNewMessage(message: Message) {
       
       // Handle text commands
       if (text === "menu") {
-        await menuService.sendMainMenu(sender);
+        await sender.sendText(recipient, 'testing menu')
+
+        /// await menuService.sendMainMenu(sender);
       } else if (text === "cart") {
-        await cartService.sendCartSummary(sender);
+        await cartService.sendCartSummary(recipient);
       }
       // ... other text handling logic
     } else if (message.type === 'location') {
-      await checkoutService.processDeliveryLocation(sender, message.data.location);
+      await checkoutService.processDeliveryLocation(recipient, message.data.location);
     }
     // ... handle other message types
   } catch (error) {

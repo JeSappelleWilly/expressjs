@@ -85,7 +85,10 @@ async function onNewMessage(message: Message) {
         await menuService.requestSupport(recipient);
       } else if (buttonId.startsWith("pay")) {
         await checkoutService.sendPaymentOptions(recipient);
-      } else if (buttonId.startsWith("deliver")) {
+      }  else if (buttonId === "confirm-order") {
+        await checkoutService.confirmFinalOrder(recipient);
+      } 
+      else if (buttonId.startsWith("deliver")) {
         await checkoutService.sendDeliveryOptions(recipient);
       } else if (buttonId.startsWith("return")) {
         await menuService.requestSupport(recipient);

@@ -36,8 +36,8 @@ const redisClient = new Redis(process.env.REDIS_URL || '');
 
 // Create WhatsApp sender
 const sender = createMessageSender(
-  process.env.NUMBER_ID || '',
-  process.env.ACCESS_TOKEN || ''
+  process.env.PHONE_NUMBER_ID || '',
+  process.env.WHATSAPP_AUTH_TOKEN || ''
 );
 
 // Create services

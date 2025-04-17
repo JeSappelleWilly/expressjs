@@ -67,6 +67,8 @@ async function onNewMessage(message: Message) {
       
       if (selectedId.startsWith("pay")) {
         await checkoutService.processPaymentMethod(recipient, selectedId);
+      } else if (selectedId.startsWith("del-")) {
+        await checkoutService.requestLocation(recipient);
       } else {
         await cartService.addItemToCart(recipient, selectedId);
         await cartService.sendCartSummary(recipient);
@@ -83,14 +85,13 @@ async function onNewMessage(message: Message) {
         await checkoutService.initiateCheckout(recipient);
       } else if (buttonId === "help") {
         await menuService.requestSupport(recipient);
-      } else if (buttonId.startsWith("pay")) {
+      } else if (buttonId === "pickup") {
         await checkoutService.sendPaymentOptions(recipient);
       }  else if (buttonId === "confirm-order") {
         await checkoutService.confirmFinalOrder(recipient);
-      } 
-      else if (buttonId.startsWith("deliver")) {
+      } else if (buttonId === "delivery") {
         await checkoutService.sendDeliveryOptions(recipient);
-      } else if (buttonId.startsWith("return")) {
+      }  else if (buttonId.startsWith("return")) {
         await menuService.requestSupport(recipient);
       }
     } else if (message.type === 'button') {
@@ -126,7 +127,7 @@ async function onNewMessage(message: Message) {
       }
       // ... other text handling logic
     } else if (message.type === 'location') {
-      await checkoutService.processDeliveryLocation(recipient, message.data.location);
+      await cartService.sendCartSummary(recipient);
     }
   } catch (error) {
     console.error('Error handling message:', error);

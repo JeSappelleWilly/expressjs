@@ -21,9 +21,9 @@ export class MenuService {
       recipientPhone,
       "Welcome to our restaurant! How can we help you today?",
       {
-        "main-menu": "📋 Browse Menu",
-        "specials": "🌟 View Today's Specials",
-        "help": "❓ Get Assistance"
+        "main-menu": "Browse Menu",
+        "specials": "View Today's Specials",
+        "help": "Get Assistance"
       },
       {
         footerText: "We're happy to serve you!"
@@ -35,9 +35,9 @@ export class MenuService {
       recipientPhone,
       "Hi there! Need help with your order?",
       {
-        "order-issue": "🔄 Problem with My Order",
-        "delivery-status": "🚚 Track My Delivery",
-        "other-help": "💬 Contact Support"
+        "order-issue": "Problem with My Order",
+        "delivery-status": "Track My Delivery",
+        "other-help": "Contact Support"
       },
       {
         footerText: "Our team is ready to assist you!"

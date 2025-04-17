@@ -15,6 +15,23 @@ import { getWebhookRouter } from "./types/webhook";
 const app = express();
 const port = process.env.PORT || 3000;
 
+// Create a raw body parser
+app.use((req, res, next) => {
+  let data = Buffer.from('');
+  
+  req.on('data', (chunk) => {
+    data = Buffer.concat([data, chunk]);
+  });
+  
+  req.on('end', () => {
+    (req as any).rawBody = data;
+    next();
+  });
+});
+
+// Add JSON body parser after raw body capture
+app.use(express.json());
+
 app.use((req, res, next) => {
   console.log('Request Headers:', req.headers);
   console.log('Request Body:', req.body);

@@ -82,6 +82,13 @@ export interface InteractiveReplyButton {
         }[];
     };
 }
+
+export interface InteractiveLocationRequest {
+    type: 'location_request_message';
+    action: {
+        name: string;
+    };
+}
 export interface InteractiveListMessage {
     type: 'list';
     action: {
@@ -96,7 +103,7 @@ export interface InteractiveListMessage {
         }[];
     };
 }
-declare type Interactive = InteractiveBase & (InteractiveReplyButton | InteractiveListMessage);
+declare type Interactive = InteractiveBase & (InteractiveReplyButton | InteractiveListMessage | InteractiveLocationRequest);
 export interface Location {
     longitude: number;
     latitude: number;
@@ -116,6 +123,7 @@ export interface MediaBase {
 export declare type Media = MediaBase & (MediaWithId | MediaWithLink);
 interface ParameterText {
     type: 'text';
+    parameter_name: string;
     text: string;
 }
 interface ParameterCurrency {
@@ -146,6 +154,7 @@ interface TemplateComponentTypeHeader {
 }
 interface TemplateComponentTypeBody {
     type: 'body';
+
     parameters: (ParameterText | ParameterCurrency | ParameterDateTime | ParameterImage | ParameterDocument | ParameterVideo)[];
 }
 interface TemplateComponentTypeButtonQuickReply {
@@ -224,6 +233,8 @@ export interface LocationMessage extends Message {
         message_id: string;
     };
 }
+
+
 export interface StickerMessage extends Message {
     type: 'sticker';
     sticker: Media;

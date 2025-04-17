@@ -289,9 +289,9 @@ export class CheckoutService {
     async sendDeliveryOptions(sender: string): Promise<void> {
         try {
             const sections = [
-                { id: "cash", title: "Cash on Delivery", description: "Pay when your order arrives" },
-                { id: "credit-card", title: "Credit Card", description: "Pay securely online" },
-                { id: "mobile-payment", title: "Mobile Payment", description: "Pay using mobile payment apps" }
+                { id: "pay-cash", title: "Cash on Delivery", description: "Pay when your order arrives" },
+                { id: "pay-credit-card", title: "Credit Card", description: "Pay securely online" },
+                { id: "pay-mobile-payment", title: "Mobile Payment", description: "Pay using mobile payment apps" }
         ];
         
         /// Send payment options
@@ -318,15 +318,15 @@ export class CheckoutService {
             
             // Map the selected ID to a payment method
             switch (selectedId) {
-                case "cash":
+                case "pay-cash":
                     paymentMethod = "cash";
                     paymentDescription = "Cash on Delivery";
                     break;
-                case "credit-card":
+                case "pay-credit-card":
                     paymentMethod = "credit_card";
                     paymentDescription = "Credit Card";
                     break;
-                case "mobile-payment":
+                case "pay-mobile-payment":
                     paymentMethod = "mobile_payment";
                     paymentDescription = "Mobile Payment";
                     break;

@@ -56,20 +56,22 @@ export class MenuService {
   async sendMainMenu(recipientPhone: string): Promise<void> {
     const categories = this.getMenuCategories();
     // Build sections as a map: section title -> array of rows
-    const sections = {
-      "main" : [
-        {
-          title: "Chicken Wings",
-          id: "wings"
-        }
-    ],
-      "drinks" : [
-        {
-          title: "Wisky",
-          id: "wisky"
-        }
-    ],
-    }
+    const sections: { [sectionTitle: string]: { id: string; title: string, description: string }[] } = {
+      Main: [
+        { id: 'wings', title: 'Chicken Wings', description: ""},
+        { id: 'drums', title: 'Chicken Drums', description: "" },
+        { id: 'spring_rolls', title: 'Spring Rolls', description: "" },
+        { id: 'burger', title: 'Classic Burger', description: "" },
+        { id: 'salad', title: 'Caesar Salad', description: "" },
+        { id: 'steak', title: 'Grilled Steak', description: "" }
+      ],
+      Drinks: [
+        { id: 'whisky', title: 'Whisky', description: "" },
+        { id: 'bissap', title: 'Bissap', description: "" },
+        { id: 'iced_tea', title: 'Iced Tea', description: "" },
+        { id: 'latte', title: 'Caffè Latte', description: "" }
+      ]
+    };
     await this.sender.sendList(
       recipientPhone,
       "Browse Menu",

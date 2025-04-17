@@ -1,6 +1,6 @@
 import isURL from 'validator/lib/isURL';
 import { ICreateMessageSender } from './bot';
-import { MediaBase, TextMessage, ReactionMessage, MediaMessage, LocationMessage, TemplateMessage, ContactMessage, InteractiveMessage, ProductMessage, ProductListMessage, CatalogMessage } from './message';
+import { MediaBase, TextMessage, ReactionMessage, MediaMessage, LocationMessage, TemplateMessage, ContactMessage, InteractiveMessage, ProductMessage, ProductListMessage, CatalogMessage, InteractiveLocationRequest } from './message';
 import { sendRequestHelper } from './helper';
 
 
@@ -111,6 +111,24 @@ export const createMessageSender: ICreateMessageSender = (
           address: options?.address,
         },
       }),
+      requestLocation:(to, bodyText, options) => sendRequest<any>({
+          ...payloadBase,
+          context: options?.reply ? { message_id: options?.reply } : undefined,
+          to,
+          type: 'interactive',
+          interactive: {
+            body: {
+              text: bodyText,
+            },
+            ...(options?.footerText
+              ? {
+                  footer: { text: options?.footerText },
+                }
+              : {}),
+            header: options?.header,
+            type: 'location_request_message',
+          },
+        }),
     sendTemplate: (to, name, languageCode, components) =>
       sendRequest<TemplateMessage>({
         ...payloadBase,
@@ -211,6 +229,7 @@ export const createMessageSender: ICreateMessageSender = (
             : {}),
         },
       }),
+
     sendProductList: (to, catalogId, headerText, bodyText, sections, options) =>
       sendRequest<ProductListMessage>({
         ...payloadBase,

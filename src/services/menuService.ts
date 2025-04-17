@@ -27,7 +27,7 @@ export class MenuService {
       "Welcome to our restaurant! How can we help you today?",
       {
         "main-menu": "Browse Menu",
-        "specials": "View Today's Specials",
+        "specials": "Today's Specials",
         "help": "Get Assistance"
       },
       {

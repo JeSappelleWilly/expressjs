@@ -56,7 +56,8 @@ async function onNewMessage(message: Message) {
   try {
     const recipient = message.from;
     const userState = await userStateService.getUserState(recipient);
-    
+    console.warn("reply payload", message.data);
+
     // Process based on message type
     if (message.type === 'interactive' && message.data.interactive?.list_reply) {
       const selectedId = message.data.interactive.list_reply.id;
@@ -68,7 +69,6 @@ async function onNewMessage(message: Message) {
         await cartService.sendCartSummary(recipient);
       }
     } else if (message.type === 'interactive' && message.data.interactive?.button_reply) {
-      console.warn("reply payload", message.data);
       const buttonId = message.data.interactive.button_reply.id;
       
       // Handle button press based on ID

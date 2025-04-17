@@ -88,11 +88,11 @@ async function onNewMessage(message: Message) {
       
       // Handle text commands
       if (text === "menu") {
-        await sender.sendText(recipient, 'testing menu')
-
-        /// await menuService.sendMainMenu(sender);
+        await menuService.sendMainMenu(recipient);
       } else if (text === "cart") {
         await cartService.sendCartSummary(recipient);
+      } else if (text === "help") {
+        await menuService.requestSupport(recipient);
       } else {
         await menuService.sendWelcomeWithButtons(recipient);
       }

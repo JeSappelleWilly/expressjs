@@ -1,5 +1,5 @@
 // services/menuService.ts
-import { MessageSender } from "../types/bot";
+import { MessageSender } from '../types/bot';
 import { CartService } from './cartService';
 
 export class MenuService {
@@ -21,16 +21,29 @@ export class MenuService {
       recipientPhone,
       "Welcome to our restaurant! How can we help you today?",
       {
-        "main-menu": "View Menu",
-        "specials": "Today's Specials",
-        "help": "Help"
+        "main-menu": "📋 Browse Menu",
+        "specials": "🌟 View Today's Specials",
+        "help": "❓ Get Assistance"
       },
       {
         footerText: "We're happy to serve you!"
       }
     );
   }
-  
+  async requestSupport(recipientPhone: string): Promise<void> {
+    await this.sender.sendReplyButtons(
+      recipientPhone,
+      "Hi there! Need help with your order?",
+      {
+        "order-issue": "🔄 Problem with My Order",
+        "delivery-status": "🚚 Track My Delivery",
+        "other-help": "💬 Contact Support"
+      },
+      {
+        footerText: "Our team is ready to assist you!"
+      }
+    );
+  }
   /**
    * Sends the main menu categories
    */

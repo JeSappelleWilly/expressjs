@@ -9,12 +9,17 @@ import { CartService } from './services/cartService';
 import { MenuService } from './services/menuService';
 import { CheckoutService } from './services/checkoutService';
 import { Message, Status } from "./types/bot";
-import { getWebhookRouter } from "./types/webhook";
 import { createMessageSender } from "./types/createbot";
+import { getWebhookRouter } from "./types/webhook";
 
 const app = express();
 const port = process.env.PORT || 3000;
-app.use(express.json());
+
+app.use((req, res, next) => {
+  console.log('Request Headers:', req.headers);
+  console.log('Request Body:', req.body);
+  next();
+});
 
 // Create Redis client
 const redisClient = new Redis(process.env.REDIS_URL || '');

@@ -60,8 +60,9 @@ async function onNewMessage(message: Message) {
     console.warn("reply message payload", message);
 
     // Process based on message type
-    if (message.type === 'interactive' && message.data.interactive?.list_reply) {
-      const selectedId = message.data.interactive.list_reply.id;
+    if (message.type === 'list_reply') {
+
+      const selectedId = message.data.id;
       
       if (selectedId.startsWith("payment")) {
         await checkoutService.processPaymentMethod(recipient, selectedId);
@@ -69,8 +70,8 @@ async function onNewMessage(message: Message) {
         await cartService.addItemToCart(recipient, selectedId);
         await cartService.sendCartSummary(recipient);
       }
-    } else if (message.type === 'interactive' && message.data.interactive?.button_reply) {
-      const buttonId = message.data.interactive.button_reply.id;
+    } else if (message.type === 'button_reply') {
+      const buttonId = message.data.id;
       
       // Handle button press based on ID
       if (buttonId === "main-menu") {

@@ -56,20 +56,35 @@ export class MenuService {
   async sendMainMenu(recipientPhone: string): Promise<void> {
     const categories = this.getMenuCategories();
     // Build sections as a map: section title -> array of rows
-    const sections: { [sectionTitle: string]: { id: string; title: string, description: string }[] } = {
+  const sections: { [sectionTitle: string]: { id: string; title: string, description: string }[] } = {
       Main: [
-        { id: 'wings', title: 'Chicken Wings', description: ""},
-        { id: 'drums', title: 'Chicken Drums', description: "" },
-        { id: 'spring_rolls', title: 'Spring Rolls', description: "" },
-        { id: 'burger', title: 'Classic Burger', description: "" },
-        { id: 'salad', title: 'Caesar Salad', description: "" },
-        { id: 'steak', title: 'Grilled Steak', description: "" }
+        { id: 'wings', title: 'Chicken Wings', description: "5.000"},
+        { id: 'drums', title: 'Chicken Drums', description: "5.000" },
+        { id: 'spring_rolls', title: 'Spring Rolls', description: "5.000" },
+        { id: 'burger', title: 'Classic Burger', description: "5.000" },
+        { id: 'salad', title: 'Caesar Salad', description: "5.000" },
+        { id: 'steak', title: 'Grilled Steak', description: "5.000" }
       ],
       Drinks: [
-        { id: 'whisky', title: 'Whisky', description: "" },
-        { id: 'bissap', title: 'Bissap', description: "" },
-        { id: 'iced_tea', title: 'Iced Tea', description: "" },
-        { id: 'latte', title: 'Caffè Latte', description: "" }
+        { id: 'whisky', title: 'Whisky', description: "5.000" },
+        { id: 'bissap', title: 'Bissap', description: "5.000" },
+        { id: 'iced_tea', title: 'Iced Tea', description: "5.000" },
+        { id: 'latte', title: 'Caffè Latte', description: "5.000" }
+      ],
+      Appetizers: [
+        { id: 'whisky', title: 'Whisky', description: "5.000" },
+        { id: 'bissap', title: 'Bissap', description: "15.000" },
+        { id: 'iced_tea', title: 'Iced Tea', description: "5.000" },
+        { id: 'latte', title: 'Caffè Latte', description: "5.000" }
+      ],
+      Sides: [
+        { id: 'fries', title: 'French Fries', description: '3.000' },
+        { id: 'mashed_potatoes', title: 'Mashed Potatoes', description: '4.000' },
+        { id: 'coleslaw', title: 'Coleslaw', description: '3.500' }
+      ],
+      Desserts: [
+        { id: 'ice_cream', title: 'Ice Cream', description: '2.500' },
+        { id: 'brownie', title: 'Chocolate Brownie', description: '3.000' }
       ]
     };
     await this.sender.sendList(

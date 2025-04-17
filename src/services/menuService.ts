@@ -37,7 +37,7 @@ export class MenuService {
           {
               "type": "text",
               "text": "Fockal Food",
-              "paramter_name": "restaurant_name"
+              "parameter_name": "restaurant_name"
           }
       ]
     }

@@ -246,5 +246,3 @@ export interface UserState {
     latitude: number
   }
 }
-
-// ... other interfaces and types ...

@@ -81,7 +81,7 @@ async function onNewMessage(message: Message) {
       // ... other button handling logic
     } else if (message.type === 'text') {
       console.warn("data", message.data);
-      const text = message.data.text.body.toLowerCase();
+      const text = message.data.text.toLowerCase();
       
       // Handle text commands
       if (text === "menu") {

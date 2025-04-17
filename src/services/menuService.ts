@@ -22,18 +22,15 @@ export class MenuService {
    * Sends welcome message with buttons
    */
   async sendWelcomeWithButtons(recipientPhone: string): Promise<void> {
-    await this.sender.sendReplyButtons(
-      recipientPhone,
-      "Welcome to our restaurant! How can we help you today?",
-      {
-        "main-menu": "Browse Menu",
-        "specials": "Today's Specials",
-        "help": "Get Assistance"
-      },
-      {
-        footerText: "We're happy to serve you!"
-      }
-    );
+    await this.sender.sendTemplate(recipientPhone, "welcome", "en_US", [ {
+      "type": "body",
+      "parameters": [
+          {
+              "type": "text",
+              "text": "Fockal Food"
+          }
+      ]
+    }])
   }
 
   async requestSupport(recipientPhone: string): Promise<void> {

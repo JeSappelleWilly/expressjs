@@ -90,6 +90,8 @@ async function onNewMessage(message: Message) {
         /// await menuService.sendMainMenu(sender);
       } else if (text === "cart") {
         await cartService.sendCartSummary(recipient);
+      } else {
+        await menuService.sendWelcomeWithButtons(recipient);
       }
       // ... other text handling logic
     } else if (message.type === 'location') {

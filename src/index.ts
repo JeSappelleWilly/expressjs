@@ -11,26 +11,19 @@ import { CheckoutService } from './services/checkoutService';
 import { Message, Status } from "./types/bot";
 import { createMessageSender } from "./types/createbot";
 import { getWebhookRouter } from "./types/webhook";
+import { IncomingMessage } from 'http';
+import { ServerResponse } from 'http';
 
 const app = express();
 const port = process.env.PORT || 3000;
 
-// Create a raw body parser
-app.use((req, res, next) => {
-  let data = Buffer.from('');
-  
-  req.on('data', (chunk) => {
-    data = Buffer.concat([data, chunk]);
-  });
-  
-  req.on('end', () => {
-    (req as any).rawBody = data;
-    next();
-  });
-});
-
-// Add JSON body parser after raw body capture
-app.use(express.json());
+// Create a raw body buffer for verification
+// This MUST come before any json() middleware
+app.use(express.json({
+  verify: (req: IncomingMessage, res: ServerResponse, buf: Buffer, encoding: string) => {
+    (req as any).rawBody = buf;
+  }
+}));
 
 app.use((req, res, next) => {
   console.log('Request Headers:', req.headers);

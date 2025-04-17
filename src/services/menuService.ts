@@ -30,7 +30,19 @@ export class MenuService {
       }
     );
   }
-  
+  async requestSupport(recipientPhone: string): Promise<void> {
+    await this.sender.sendReplyButtons(
+      recipientPhone,
+      "Hi there! Need help with your order?",
+      {
+        "delivery-status": "Track My Order",
+        "other-help": "Contact Support"
+      },
+      {
+        footerText: "Our team is ready to assist you!"
+      }
+    );
+  }
   /**
    * Sends the main menu categories
    */

@@ -8,7 +8,7 @@ export class WhatsAppService {
   private sender: MessageSender;
 
   constructor(config?: { apiUrl?: string, authToken?: string, phoneNumberId?: string }) {
-    this.phoneNumberId = config?.phoneNumberId || process.env.PHONE_NUMBER_ID!;
+    this.phoneNumberId = process.env.PHONE_NUMBER_ID!;
     const authToken = config?.authToken || process.env.WHATSAPP_AUTH_TOKEN || '';
     this.sender = createMessageSender(this.phoneNumberId, authToken);
 

@@ -14,6 +14,7 @@ import { createMessageSender } from "./types/createbot";
 
 const app = express();
 const port = process.env.PORT || 3000;
+app.use(express.json());
 
 // Create Redis client
 const redisClient = new Redis(process.env.REDIS_URL || '');

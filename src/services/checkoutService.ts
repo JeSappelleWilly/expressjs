@@ -9,6 +9,7 @@ import { MessageSender } from "../types/bot";
  * Service for managing the checkout process
  */
 export class CheckoutService {
+
     private userStateService: UserStateService;
     private cartService: CartService;
     private redisClient: Redis;
@@ -89,7 +90,25 @@ export class CheckoutService {
             );
         }
     }
-    
+    async requestLocation(recipient: string) {
+        try {
+            // Update user state
+            await this.userStateService.setCheckoutInfo(recipient, "delivery");
+            
+            // Send pickup confirmation
+            await this.sender.requestLocation(
+                recipient,
+                "Please share your location for the delivery"
+            );
+            
+            
+        } catch (error) {
+            console.error(`Error setting up pickup order for user ${recipient}:`, error);
+            await this.sender.sendText(
+                recipient,
+                "Sorry, we encountered an error while processing your pickup selection. Please try again."
+            );
+        }    }
     /**
      * Sets up a pickup order
      */
@@ -288,16 +307,44 @@ export class CheckoutService {
 
     async sendDeliveryOptions(sender: string): Promise<void> {
         try {
-            const sections = [
-                { id: "pay-cash", title: "Cash on Delivery", description: "Pay when your order arrives" },
-                { id: "pay-credit-card", title: "Credit Card", description: "Pay securely online" },
-                { id: "pay-mobile-payment", title: "Mobile Payment", description: "Pay using mobile payment apps" }
-        ];
+            const sections: { [sectionTitle: string]: { id: string; title: string, description: string }[] } = {
+                Priority: [
+                    {
+                        "id": "del-priority_express",
+                        "title": "Priority Mail Express",
+                        "description": "Next Day to 2 Days"
+                      },
+                      {
+                        "id": "del-priority_mail",
+                        "title": "Priority Mail",
+                        "description": "1–3 Days"
+                      }
+                  ],
+                  Regular: [
+                      {
+                        "id": "del-usps_ground_advantage",
+                        "title": "USPS Ground Advantage",
+                        "description": "2–5 Days"
+                      },
+                      {
+                        "id": "del-media_mail",
+                        "title": "Media Mail",
+                        "description": "2–8 Days"
+                      }
+                  ]}
+              
         
         /// Send payment options
         await this.sender.sendList(
                 sender, "Submit", "Please select your preferred payment method:", 
-                { "Payment Options": sections}
+                sections,
+                {
+                    footerText: "Dokal Food: Your gateway to succulents™",
+                    header: {
+                        type: "text",
+                        text: "Choose Shipping Option"
+                    }
+                }
             )
         } catch (error) {
             console.error(`Error sending payment options to user ${sender}:`, error);

@@ -1,5 +1,6 @@
 import { findAllMenuItems, menuCategories } from "./db";
 import { MenuItem } from "./types";
+import { RequestHandler } from 'express';
 
 export interface FreeFormObject {
   [key: string]: any;

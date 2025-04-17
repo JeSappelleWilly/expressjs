@@ -127,6 +127,9 @@ export const createMessageSender: ICreateMessageSender = (
               : {}),
             header: options?.header,
             type: 'location_request_message',
+            action: {
+                name: "send_location"
+            }
           },
         }),
     sendTemplate: (to, name, languageCode, components) =>

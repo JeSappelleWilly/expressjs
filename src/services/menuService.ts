@@ -61,26 +61,15 @@ export class MenuService {
         { id: 'wings', title: 'Chicken Wings', description: "5.000"},
         { id: 'drums', title: 'Chicken Drums', description: "5.000" },
         { id: 'spring_rolls', title: 'Spring Rolls', description: "5.000" },
-        { id: 'burger', title: 'Classic Burger', description: "5.000" },
-        { id: 'salad', title: 'Caesar Salad', description: "5.000" },
-        { id: 'steak', title: 'Grilled Steak', description: "5.000" }
+        { id: 'burger', title: 'Classic Burger', description: "5.000" }
       ],
       Drinks: [
-        { id: 'whisky', title: 'Whisky', description: "5.000" },
         { id: 'bissap', title: 'Bissap', description: "5.000" },
         { id: 'iced_tea', title: 'Iced Tea', description: "5.000" },
-        { id: 'latte', title: 'Caffè Latte', description: "5.000" }
-      ],
-      Appetizers: [
-        { id: 'whisky', title: 'Whisky', description: "5.000" },
-        { id: 'bissap', title: 'Bissap', description: "15.000" },
-        { id: 'iced_tea', title: 'Iced Tea', description: "5.000" },
-        { id: 'latte', title: 'Caffè Latte', description: "5.000" }
       ],
       Sides: [
         { id: 'fries', title: 'French Fries', description: '3.000' },
-        { id: 'mashed_potatoes', title: 'Mashed Potatoes', description: '4.000' },
-        { id: 'coleslaw', title: 'Coleslaw', description: '3.500' }
+        { id: 'mashed_potatoes', title: 'Mashed Potatoes', description: '4.000' }
       ],
       Desserts: [
         { id: 'ice_cream', title: 'Ice Cream', description: '2.500' },

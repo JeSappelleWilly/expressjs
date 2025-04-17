@@ -65,7 +65,7 @@ async function onNewMessage(message: Message) {
 
       const selectedId = message.data.id;
       
-      if (selectedId.startsWith("payment")) {
+      if (selectedId.startsWith("pay")) {
         await checkoutService.processPaymentMethod(recipient, selectedId);
       } else {
         await cartService.addItemToCart(recipient, selectedId);
@@ -125,10 +125,8 @@ async function onNewMessage(message: Message) {
     } else if (message.type === 'location') {
       await checkoutService.processDeliveryLocation(recipient, message.data.location);
     }
-    // ... handle other message types
   } catch (error) {
     console.error('Error handling message:', error);
-    // Send error message tfo user
     await sender.sendText(
       message.from,
       "Sorry, we experienced an issue processing your request. Please try again."

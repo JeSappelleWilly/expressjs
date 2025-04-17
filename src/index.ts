@@ -57,6 +57,7 @@ async function onNewMessage(message: Message) {
     const recipient = message.from;
     const userState = await userStateService.getUserState(recipient);
     console.warn("reply payload", message.data);
+    console.warn("reply message payload", message);
 
     // Process based on message type
     if (message.type === 'interactive' && message.data.interactive?.list_reply) {

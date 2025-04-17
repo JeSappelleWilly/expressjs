@@ -127,7 +127,7 @@ async function onNewMessage(message: Message) {
       }
       // ... other text handling logic
     } else if (message.type === 'location') {
-      await cartService.sendCartSummary(recipient);
+      await checkoutService.sendPaymentOptions(recipient);
     }
   } catch (error) {
     console.error('Error handling message:', error);

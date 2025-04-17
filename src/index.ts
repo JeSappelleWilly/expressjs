@@ -16,7 +16,7 @@ import { ServerResponse } from 'http';
 
 const app = express();
 const port = process.env.PORT || 3000;
-
+const FACEBOOK_APP_SECRET= null;
 // Create a raw body buffer for verification
 // This MUST come before any json() middleware
 app.use(express.json({
@@ -115,7 +115,7 @@ app.use(
   getWebhookRouter({
     webhookVerifyToken: process.env.WEBHOOK_VERIFY_TOKEN || 'ceSecret',
     onNewMessage,
-    appSecret: process.env.FACEBOOK_APP_SECRET!, // Optional but recommended
+    appSecret: FACEBOOK_APP_SECRET, // Optional but recommended
     onStatusChange, // Optional
     logAllEntrantRequests: process.env.NODE_ENV !== 'production', // Optional, log in development
   })

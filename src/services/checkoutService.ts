@@ -1,8 +1,7 @@
 // services/checkoutService.ts
 import { CartService } from "./cartService";
 import { UserStateService } from "./userStateService";
-import { WhatsAppService } from "./whatsappService";
-import { MessageFactory } from "./messageFactory";
+
 import Redis from "ioredis";
 import { MessageSender } from "../types/bot";
 
@@ -278,6 +277,28 @@ export class CheckoutService {
                 )
             
             
+        } catch (error) {
+            console.error(`Error sending payment options to user ${sender}:`, error);
+            await this.sender.sendText(
+                sender,
+                "Sorry, we encountered an error while processing payment options. Please try again."
+            );
+        }
+    }
+
+    async sendDeliveryOptions(sender: string): Promise<void> {
+        try {
+            const sections = [
+                { id: "cash", title: "Cash on Delivery", description: "Pay when your order arrives" },
+                { id: "credit-card", title: "Credit Card", description: "Pay securely online" },
+                { id: "mobile-payment", title: "Mobile Payment", description: "Pay using mobile payment apps" }
+        ];
+        
+        /// Send payment options
+        await this.sender.sendList(
+                sender, "Submit", "Please select your preferred payment method:", 
+                { "Payment Options": sections}
+            )
         } catch (error) {
             console.error(`Error sending payment options to user ${sender}:`, error);
             await this.sender.sendText(

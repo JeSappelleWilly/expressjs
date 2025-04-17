@@ -40,7 +40,7 @@ export const sendRequestHelper =
       const { data: rawResult } = await axios({
         method: 'post',
         url: `https://graph.facebook.com/${version}/${fromPhoneNumberId}/messages`,
-        data,
+        data: JSON.stringify(data),
         headers: {
           Authorization: `Bearer ${accessToken}`,
           'Content-Type': 'application/json',

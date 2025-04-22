@@ -74,7 +74,7 @@ export class CheckoutService {
                 sender,
                 "Comment souhaitez-vous recevoir votre commande ?",
                 {
-                    "pickup": "Retrait",
+                    "pickup": "Retrait en Magasin",
                     "delivery": "Livraison",
                 },
             );

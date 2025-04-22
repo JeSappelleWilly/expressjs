@@ -266,17 +266,17 @@ export class CartService {
       if (!cart.items.length) {
         await this.sender.sendText(
           userId, 
-          "Your cart is empty. Please add items before checkout."
+          "Votre panier est vide. Veuillez ajouter des articles avant de passer à la caisse."
         );
         return;
       }
       
       // Create cart summary text
-      let summaryText = "🛒 *Your Cart*\n\n";
+      let summaryText = "🛒 *Votre Panier*\n\n";
       
       // Add each item with quantity, price, and special instructions
       cart.items.forEach((item, index) => {
-        summaryText += `${index + 1}. ${item.name} x${item.quantity} - $${(item.price * item.quantity).toFixed(2)}\n`;
+        summaryText += `${index + 1}. ${item.name} x${item.quantity} - ${(item.price * item.quantity).toFixed(2)}€\n`;
         
         if (item.specialInstructions) {
           summaryText += `   _Note: ${item.specialInstructions}_\n`;
@@ -284,17 +284,17 @@ export class CartService {
       });
       
       // Add subtotal, tax, discounts, and total
-      summaryText += `\n*Subtotal:* $${cart.subtotal.toFixed(2)}\n`;
-      summaryText += `*Tax:* $${cart.tax.toFixed(2)}\n`;
+      summaryText += `\n*Sous-total:* ${cart.subtotal.toFixed(2)}€\n`;
+      summaryText += `*Taxes:* ${cart.tax.toFixed(2)}€\n`;
       
       // Add any discounts
       if (cart.discounts.length > 0) {
         cart.discounts.forEach(discount => {
-          summaryText += `*Discount (${discount.code}):* -$${discount.amount.toFixed(2)}\n`;
+          summaryText += `*Remise (${discount.code}):* -${discount.amount.toFixed(2)}€\n`;
         });
       }
       
-      summaryText += `*Total:* $${cart.total.toFixed(2)}\n`;
+      summaryText += `*Total:* ${cart.total.toFixed(2)}€\n`;
       
       // Send the cart summary
       await this.sender.sendText(userId, summaryText);
@@ -303,11 +303,11 @@ export class CartService {
       await this.sender.sendReplyButtons(
           userId,
       
-          "What would you like to do with your cart?",
+          "Que voulez-vous faire avec votre panier ?",
           {
-            "checkout": "Checkout",
-            "main-menu": "Continue Shopping",
-            "cancel-order": "Clear Cart"
+            "checkout": "Commander",
+            "main-menu": "Continuer achat",
+            "cancel-order": "Vider panier"
           },          
         );
     } catch (error) {
@@ -332,10 +332,10 @@ export class CartService {
       
       // For this example, we'll just prompt for special instructions
       await this.sender.sendReplyButtons(
-        userId, "Would you like to add any special instructions for this item?",
+        userId, "Souhaitez-vous ajouter des instructions spéciales pour cet article ?",
             {
-              "add-instructions": "Add Instructions",
-              "confirm-customization": "Add to Cart"
+              "add-instructions": "Ajouter infos",
+              "confirm-customization": "Ajouter au panier"
             },          
         );
     } catch (error) {

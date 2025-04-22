@@ -47,13 +47,13 @@ export class MenuService {
   async requestSupport(recipientPhone: string): Promise<void> {
     await this.sender.sendReplyButtons(
       recipientPhone,
-      "Hi there! Need help with your order?",
+      "Bonjour ! Besoin d'aide avec votre commande ?",
       {
-        "delivery-status": "Track My Order",
-        "other-help": "Contact Support"
+        "delivery-status": "Ma Commande",
+        "other-help": "Besoin daide"
       },
       {
-        footerText: "Our team is ready to assist you!"
+        footerText: "Notre equipe est a l:ecoute!"
       }
     );
   }
@@ -86,8 +86,8 @@ export class MenuService {
     };
     await this.sender.sendList(
       recipientPhone,
-      "Browse Menu",
-      "Please select a category to view items:",
+      "Parcourir le menu",
+      "Veuillez sélectionner une catégorie pour afficher les articles :",
       sections,
       {
         footerText: "All prices include tax"
@@ -119,7 +119,7 @@ export class MenuService {
       `Browse our ${categoryTitle} selection:`,
       sections,
       {
-        footerText: "Tap an item to add it to your cart"
+        footerText : "Touchez un article pour l'ajouter à votre panier"      
       }
     );
   }

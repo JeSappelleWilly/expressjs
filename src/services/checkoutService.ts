@@ -64,7 +64,7 @@ export class CheckoutService {
             if (!cart.items || cart.items.length === 0) {
                 await this.sender.sendText(
                     sender,
-                    "Your cart is empty. Please add items before checkout."
+                    "Votre panier est vide. Veuillez ajouter des articles avant de passer à la caisse."
                 );
                 return;
             }
@@ -72,10 +72,10 @@ export class CheckoutService {
             // Send delivery options message
             await this.sender.sendReplyButtons(
                 sender,
-                 "How would you like to receive your order?",
+                "Comment souhaitez-vous recevoir votre commande ?",
                 {
-                    "pickup" : "Pickup" ,
-                    "delivery": "Delivery",
+                    "pickup": "Retrait",
+                    "delivery": "Livraison",
                 },
             );
             
@@ -86,7 +86,7 @@ export class CheckoutService {
             console.error(`Error initiating checkout for user ${sender}:`, error);
             await this.sender.sendText(
                 sender,
-                "Sorry, we encountered an error while starting checkout. Please try again."
+                "Désolé, une erreur est survenue. Veuillez réessayer."
             );
         }
     }
@@ -98,7 +98,7 @@ export class CheckoutService {
             // Send pickup confirmation
             await this.sender.requestLocation(
                 recipient,
-                "Please share your location for the delivery"
+                "Partagez votre position pour la livraison"
             );
             
             
@@ -106,7 +106,7 @@ export class CheckoutService {
             console.error(`Error setting up pickup order for user ${recipient}:`, error);
             await this.sender.sendText(
                 recipient,
-                "Sorry, we encountered an error while processing your pickup selection. Please try again."
+                "Erreur lors du traitement. Veuillez réessayer."
             );
         }    }
     /**
@@ -120,7 +120,7 @@ export class CheckoutService {
             // Send pickup confirmation
             await this.sender.sendText(
                 sender,
-                "You've selected Pickup. Your order will be ready for pickup at our store."
+                "Retrait choisi. Votre commande sera prête dans notre boutique."
             );
             
             // Proceed to payment options
@@ -130,7 +130,7 @@ export class CheckoutService {
             console.error(`Error setting up pickup order for user ${sender}:`, error);
             await this.sender.sendText(
                 sender,
-                "Sorry, we encountered an error while processing your pickup selection. Please try again."
+                "Erreur lors du traitement. Veuillez réessayer."
             );
         }
     }
@@ -143,8 +143,8 @@ export class CheckoutService {
             // Update user state
             await this.userStateService.setCheckoutInfo(sender, "delivery");
             const sections = {
-                    "share-location": "Share Location",
-                    "cancel-checkout": "Cancel"
+                    "share-location": "Partager position",
+                    "cancel-checkout": "Annuler"
                 }                        
             
             // Ask for delivery address
@@ -159,7 +159,7 @@ export class CheckoutService {
             console.error(`Error setting up delivery order for user ${sender}:`, error);
             await this.sender.sendText(
                 sender,
-                "Sorry, we encountered an error while processing your delivery selection. Please try again."
+                "Erreur lors du traitement. Veuillez réessayer."
             );
         }
     }
@@ -173,7 +173,7 @@ export class CheckoutService {
             if (!address || address.trim().length < 5) {
                 await this.sender.sendText(
                     sender,
-                    "Please provide a valid address for delivery."
+                    "Veuillez fournir une adresse valide pour la livraison."
                 );
                 return;
             }
@@ -184,7 +184,7 @@ export class CheckoutService {
             // Confirm address and proceed to payment
             await this.sender.sendText(
                 sender,
-                `Your delivery address has been set to:\n\n${address}`
+                `Votre adresse de livraison est définie comme :\n\n${address}`
             );
             
             // Proceed to payment options
@@ -194,7 +194,7 @@ export class CheckoutService {
             console.error(`Error processing delivery address for user ${sender}:`, error);
             await this.sender.sendText(
                 sender,
-                "Sorry, we encountered an error while saving your address. Please try again."
+                "Erreur lors de l'enregistrement. Veuillez réessayer."
             );
         }
     }
@@ -211,7 +211,7 @@ export class CheckoutService {
         try {
             const address = location.address || 
                             location.name || 
-                            `Location at ${location.latitude.toFixed(6)}, ${location.longitude.toFixed(6)}`;
+                            `Position à ${location.latitude.toFixed(6)}, ${location.longitude.toFixed(6)}`;
             
             // Update user state with location
             await this.userStateService.setCheckoutInfo(sender, "delivery", address);
@@ -227,7 +227,7 @@ export class CheckoutService {
             // Confirm location and proceed to payment
             await this.sender.sendText(
                 sender,
-                `Your delivery location has been set to:\n\n${address}`
+                `Votre lieu de livraison est défini comme :\n\n${address}`
             );
             
             // Proceed to payment options
@@ -237,7 +237,7 @@ export class CheckoutService {
             console.error(`Error saving customer location for user ${sender}:`, error);
             await this.sender.sendText(
                 sender,
-                "Sorry, we encountered an error while saving your location. Please try again."
+                "Erreur d'enregistrement. Veuillez réessayer."
             );
         }
     }
@@ -255,7 +255,7 @@ export class CheckoutService {
             if (!location) {
                 await this.sender.sendText(
                     sender,
-                    "We couldn't process your location. Please try sharing it again or type your address instead."
+                    "Position non reçue. Réessayez ou saisissez votre adresse."
                 );
                 return;
             }
@@ -266,7 +266,7 @@ export class CheckoutService {
             console.error(`Error processing delivery location for user ${sender}:`, error);
             await this.sender.sendText(
                 sender,
-                "Sorry, we encountered an error while processing your location. Please try again."
+                "Erreur de traitement. Veuillez réessayer."
             );
         }
     }
@@ -284,15 +284,15 @@ export class CheckoutService {
                 step: "selecting_payment"
             });
             const sections = [
-                    { id: "pay-cash", title: "Cash on Delivery", description: "Pay when your order arrives" },
-                    { id: "pay-credit-card", title: "Credit Card", description: "Pay securely online" },
-                    { id: "pay-mobile-payment", title: "Mobile Payment", description: "Pay using mobile payment apps" }
+                    { id: "pay-cash", title: "À la livraison", description: "Payez à la réception" },
+                    { id: "pay-credit-card", title: "Carte bancaire", description: "Paiement sécurisé en ligne" },
+                    { id: "pay-mobile-payment", title: "Paiement mobile", description: "Via applications mobiles" }
             ];
             
             // Send payment options
             await this.sender.sendList(
-                    sender, "Submit", "Please select your preferred payment method:", 
-                    { "Payment Options": sections}
+                    sender, "Valider", "Choisissez votre mode de paiement :", 
+                    { "Options de paiement": sections}
                 )
             
             
@@ -300,7 +300,7 @@ export class CheckoutService {
             console.error(`Error sending payment options to user ${sender}:`, error);
             await this.sender.sendText(
                 sender,
-                "Sorry, we encountered an error while processing payment options. Please try again."
+                "Erreur de traitement. Veuillez réessayer."
             );
         }
     }
@@ -308,41 +308,41 @@ export class CheckoutService {
     async sendDeliveryOptions(sender: string): Promise<void> {
         try {
             const sections: { [sectionTitle: string]: { id: string; title: string, description: string }[] } = {
-                Priority: [
+                Prioritaire: [
                     {
                         "id": "del-priority_express",
-                        "title": "Priority Mail Express",
-                        "description": "Next Day to 2 Days"
+                        "title": "Express",
+                        "description": "1 à 2 jours"
                       },
                       {
                         "id": "del-priority_mail",
-                        "title": "Priority Mail",
-                        "description": "1–3 Days"
+                        "title": "Prioritaire",
+                        "description": "1 à 3 jours"
                       }
                   ],
-                  Regular: [
+                  Standard: [
                       {
                         "id": "del-usps_ground_advantage",
-                        "title": "USPS Ground Advantage",
-                        "description": "2–5 Days"
+                        "title": "Standard",
+                        "description": "2 à 5 jours"
                       },
                       {
                         "id": "del-media_mail",
-                        "title": "Media Mail",
-                        "description": "2–8 Days"
+                        "title": "Économique",
+                        "description": "2 à 8 jours"
                       }
                   ]}
               
         
         /// Send payment options
         await this.sender.sendList(
-                sender, "Submit", "Please select your preferred payment method:", 
+                sender, "Valider", "Choisissez votre option d'expédition :", 
                 sections,
                 {
-                    footerText: "Dokal Food: Your gateway to succulents™",
+                    footerText: "Dokal Food: Votre porte vers les succulents™",
                     header: {
                         type: "text",
-                        text: "Choose Shipping Option"
+                        text: "Mode d'expédition"
                     }
                 }
             )
@@ -350,7 +350,7 @@ export class CheckoutService {
             console.error(`Error sending payment options to user ${sender}:`, error);
             await this.sender.sendText(
                 sender,
-                "Sorry, we encountered an error while processing payment options. Please try again."
+                "Erreur de traitement. Veuillez réessayer."
             );
         }
     }
@@ -367,19 +367,19 @@ export class CheckoutService {
             switch (selectedId) {
                 case "pay-cash":
                     paymentMethod = "cash";
-                    paymentDescription = "Cash on Delivery";
+                    paymentDescription = "Paiement à la livraison";
                     break;
                 case "pay-credit-card":
                     paymentMethod = "credit_card";
-                    paymentDescription = "Credit Card";
+                    paymentDescription = "Carte bancaire";
                     break;
                 case "pay-mobile-payment":
                     paymentMethod = "mobile_payment";
-                    paymentDescription = "Mobile Payment";
+                    paymentDescription = "Paiement mobile";
                     break;
                 default:
                     paymentMethod = "cash";
-                    paymentDescription = "Cash on Delivery";
+                    paymentDescription = "Paiement à la livraison";
             }
             
             // Update user state with payment method
@@ -388,7 +388,7 @@ export class CheckoutService {
             // Confirm payment method selection
             await this.sender.sendText(
                 sender,
-                `You've selected ${paymentDescription} as your payment method.`
+                `Vous avez choisi ${paymentDescription} comme mode de paiement.`
             );
             
             // For credit card or mobile payment, we would typically redirect to payment gateway
@@ -396,7 +396,7 @@ export class CheckoutService {
             if (paymentMethod === "credit_card" || paymentMethod === "mobile_payment") {
                 await this.sender.sendText(
                     sender,
-                    "For this demo, we'll simulate payment completion automatically."
+                    "Pour cette démo, nous simulerons le paiement automatiquement."
                 );
             }
             
@@ -407,7 +407,7 @@ export class CheckoutService {
             console.error(`Error processing payment method for user ${sender}:`, error);
             await this.sender.sendText(
                 sender,
-                "Sorry, we encountered an error while processing your payment selection. Please try again."
+                "Erreur de traitement. Veuillez réessayer."
             );
         }
     }
@@ -424,11 +424,11 @@ export class CheckoutService {
             const userState = await this.userStateService.getUserState(sender);
             
             // Create summary message
-            let summaryText = "📋 *Order Summary*\n\n";
+            let summaryText = "📋 *Récapitulatif*\n\n";
             
             // Add items
             cart.items.forEach((item, index) => {
-                summaryText += `${index + 1}. ${item.name} x${item.quantity} - $${(item.price * item.quantity).toFixed(2)}\n`;
+                summaryText += `${index + 1}. ${item.name} x${item.quantity} - ${(item.price * item.quantity).toFixed(2)}€\n`;
                 
                 if (item.specialInstructions) {
                     summaryText += `   _Note: ${item.specialInstructions}_\n`;
@@ -436,44 +436,44 @@ export class CheckoutService {
             });
             
             // Add subtotal, tax, discounts, and total
-            summaryText += `\n*Subtotal:* $${cart.subtotal.toFixed(2)}\n`;
-            summaryText += `*Tax:* $${cart.tax.toFixed(2)}\n`;
+            summaryText += `\n*Sous-total:* ${cart.subtotal.toFixed(2)}€\n`;
+            summaryText += `*Taxes:* ${cart.tax.toFixed(2)}€\n`;
             
             // Add any discounts
             if (cart.discounts && cart.discounts.length > 0) {
                 cart.discounts.forEach(discount => {
-                    summaryText += `*Discount (${discount.code}):* -$${discount.amount.toFixed(2)}\n`;
+                    summaryText += `*Remise (${discount.code}):* -${discount.amount.toFixed(2)}€\n`;
                 });
             }
             
-            summaryText += `*Total:* $${cart.total.toFixed(2)}\n\n`;
+            summaryText += `*Total:* ${cart.total.toFixed(2)}€\n\n`;
             
             // Add delivery info
             if (userState.deliveryType === "delivery") {
-                summaryText += `*Delivery Address:* ${userState.deliveryAddress}\n`;
+                summaryText += `*Adresse:* ${userState.deliveryAddress}\n`;
             } else {
-                summaryText += "*Pickup at Store*\n";
+                summaryText += "*Retrait en magasin*\n";
             }
             
             // Add payment method
             const paymentMethod = userState.paymentMethod === "credit_card" 
-                ? "Credit Card" 
+                ? "Carte bancaire" 
                 : userState.paymentMethod === "mobile_payment" 
-                    ? "Mobile Payment" 
-                    : "Cash on Delivery";
+                    ? "Paiement mobile" 
+                    : "Paiement à la livraison";
             
-            summaryText += `*Payment Method:* ${paymentMethod}\n\n`;
+            summaryText += `*Paiement:* ${paymentMethod}\n\n`;
             
-            summaryText += "Please confirm your order or make changes.";
+            summaryText += "Confirmez ou modifiez votre commande.";
             
             // Send summary
             await this.sender.sendText(sender, summaryText);
             
             // Send confirmation buttons
-            await this.sender.sendReplyButtons( sender,  "Would you like to place this order now?", 
+            await this.sender.sendReplyButtons( sender,  "Commander maintenant ?", 
                         {
-                        "confirm-order": "Place Order" ,
-                        "cancel-order": "Cancel",
+                        "confirm-order": "Commander" ,
+                        "cancel-order": "Annuler",
                 }
             );
             
@@ -481,7 +481,7 @@ export class CheckoutService {
             console.error(`Error sending order summary for user ${sender}:`, error);
             await this.sender.sendText(
                 sender,
-                "Sorry, we encountered an error while creating your order summary. Please try again."
+                "Erreur de traitement. Veuillez réessayer."
             );
         }
     }
@@ -528,11 +528,11 @@ export class CheckoutService {
             // Send confirmation message
             await this.sender.sendText(
                 sender,
-                `✅ *Order Confirmed!*\n\nYour order #${orderId} has been received and is being processed.\n\n${
+                `✅ *Commande confirmée!*\n\nVotre commande n°${orderId} a été reçue et est en cours de traitement.\n\n${
                     order.deliveryType === "delivery" 
-                        ? `Estimated delivery time: ${this.formatEstimatedTime(order.estimatedDeliveryTime)}`
-                        : `Your order will be ready for pickup in approximately ${Math.floor((order.estimatedDeliveryTime - Date.now()) / 60000)} minutes.`
-                }\n\nThank you for your order!`
+                        ? `Heure estimée: ${this.formatEstimatedTime(order.estimatedDeliveryTime)}`
+                        : `Votre commande sera prête dans environ ${Math.floor((order.estimatedDeliveryTime - Date.now()) / 60000)} minutes.`
+                }\n\nMerci pour votre commande!`
             );
             
             // Clear the cart
@@ -542,15 +542,15 @@ export class CheckoutService {
             await this.userStateService.resetState(sender);
             
             // Send return to menu button
-            await this.sender.sendReplyButtons(sender,"You can place another order or check your order status.", 
+            await this.sender.sendReplyButtons(sender,"Nouvelle commande ou vérifiez votre statut.", 
                 {
-                    "main-menu": "Return to Menu",
-                    "my-orders": "My Orders",
+                    "main-menu": "Menu principal",
+                    "my-orders": "Mes commandes",
                 },
                     {
                         header: {
                             type: "text",
-                            text: "What would you like to do next?"
+                            text: "Que faire ensuite?"
                         }
                     })        
             
@@ -558,7 +558,7 @@ export class CheckoutService {
             console.error(`Error confirming final order for user ${sender}:`, error);
             await this.sender.sendText(
                 sender,
-                "Sorry, we encountered an error while processing your order. Please try again."
+                "Erreur de traitement. Veuillez réessayer."
             );
         }
     }
@@ -605,16 +605,16 @@ export class CheckoutService {
             // Send cancellation confirmation
             await this.sender.sendText(
                 sender,
-                "Your order has been cancelled. Your cart items have been saved for later."
+                "Commande annulée. Articles sauvegardés pour plus tard."
             );
             
             // Send return to menu button
             await this.sender.sendReplyButtons(
                     sender,
-                    "You can continue shopping or view your cart.",
+                    "Continuez vos achats ou consultez votre panier.",
                         {
-                         "main-menu": "Main Menu",
-                         "view-cart": "View Cart",
+                         "main-menu": "Menu principal",
+                         "view-cart": "Voir panier",
                         },
                 )
             
@@ -623,7 +623,7 @@ export class CheckoutService {
             console.error(`Error cancelling order for user ${sender}:`, error);
             await this.sender.sendText(
                 sender,
-                "Sorry, we encountered an error while cancelling your order. Please try again."
+                "Erreur d'annulation. Veuillez réessayer."
             );
         }
     }

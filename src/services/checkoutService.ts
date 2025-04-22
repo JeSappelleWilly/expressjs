@@ -284,7 +284,7 @@ export class CheckoutService {
                 step: "selecting_payment"
             });
             const sections = [
-                    { id: "pay-cash", title: "À la livraison", description: "Payez à la réception" },
+                    { id: "pay-cash", title: "Comptant", description: "Payez à la réception" },
                     { id: "pay-credit-card", title: "Carte bancaire", description: "Paiement sécurisé en ligne" },
                     { id: "pay-mobile-payment", title: "Paiement mobile", description: "Via applications mobiles" }
             ];

@@ -516,46 +516,9 @@ export class CheckoutService {
                 createdAt: Date.now(),
                 estimatedDeliveryTime: this.calculateEstimatedDelivery(userState.deliveryType || "pickup")
             };
-            
-        // Extract necessary information for the PawaPay Widget Session
-        const depositId = orderId; // Using order ID as deposit ID
-        const amount = cart.total.toFixed(2);
-        const statementDescription = `Order ${orderId}`;
-        const payerMsisdn = sender; // Ensure you have this
-        const orderIdentifier = orderId;
-        const customerEmail = `${sender}@example.com`;
-        const paymentReason = "Payment for order"; // Or something more specific
-        const returnURL = `https://${process.env.RAILWAY_PUBLIC_DOMAIN!}/`;
+    
 
-        if (userState.paymentMethod === "mobile_payment") {
-            await this.sender.sendText(sender, "Redirecting to mobile payment...");
-            const paymentUrl = await initiatePawaPayWidgetSession(
-                depositId,
-                returnURL,
-                statementDescription,
-                amount,
-                payerMsisdn,
-                paymentReason,
-                orderIdentifier,
-                customerEmail
-            );
-
-                if (paymentUrl) {
-                    // Redirect the user to the payment URL
-                    await this.sender.sendText(sender, `Please follow this link to complete your payment: ${paymentUrl}`);
-                    // You might need a more sophisticated way to handle the redirection depending on your platform
-                    order.status = "payment_pending_redirect";
-                } else {
-                    await this.sender.sendText(sender, "Failed to initiate payment session. Please try again.");
-                    order.status = "payment_failed";
-                }
-            } else if (userState.paymentMethod === "cash") {
-                order.status = "pending_cash";
-                await this.sender.sendText(sender, "Your order will be processed upon confirmation of cash payment on delivery/pickup.");
-            } else if (userState.paymentMethod === "credit_card") {
-                await this.sender.sendText(sender, "Credit card payment via widget is not directly supported by this PawaPay integration. You might need a different integration method.");
-                order.status = "pending_credit_card";
-            }       
+  
             // Save order to Redis
             await this.redisClient.set(
                 this.getOrderKey(orderId),

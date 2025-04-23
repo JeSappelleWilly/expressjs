@@ -29,7 +29,7 @@ export async function initiatePawaPayWidgetSession(
                 { fieldName: "customerId", fieldValue: customerEmail, isPII: true },
             ],
         };
-
+        console.log("PawaPay Payload:", payload);
         const options = {
             method: "POST",
             headers: {

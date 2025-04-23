@@ -1,7 +1,7 @@
 // services/checkoutService.ts
 import { CartService } from "./cartService";
 import { UserStateService } from "./userStateService";
-
+import { pay } from "./pay";
 import Redis from "ioredis";
 import { MessageSender } from "../types/bot";
 
@@ -516,6 +516,44 @@ export class CheckoutService {
                 createdAt: Date.now(),
                 estimatedDeliveryTime: this.calculateEstimatedDelivery(userState.deliveryType || "pickup")
             };
+             // Extract necessary information for the pay function
+        const payee = "PAWAPAY_MERCHANT_ID"; // Replace with your actual payee identifier
+        const depositId = orderId; // Using the order ID as a deposit ID (you might need a different logic)
+        const amount = cart.total.toFixed(2); // Use the cart total
+        const statementDescription = `Order ${orderId}`; // Create a relevant description
+        const payerMsisdn = userState.phoneNumber; // Assuming you store phone number in user state
+        const orderIdentifier = orderId;
+        const customerEmail = userState.email || `${sender}@example.com`; // Try to get email, otherwise use a default
+
+        // Initiate the payment
+        if (userState.paymentMethod === "mobile_payment") {
+            await this.sender.sendText(sender, "Initiating mobile payment...");
+            try {
+                await pay(
+                    payee,
+                    depositId,
+                    amount,
+                    statementDescription,
+                    payerMsisdn,
+                    orderIdentifier,
+                    customerEmail
+                );
+                // Handle successful payment (e.g., update order status)
+                order.status = "processing_payment";
+                await this.sender.sendText(sender, "Payment initiated successfully. We will notify you of the outcome.");
+            } catch (paymentError) {
+                console.error("Payment error:", paymentError);
+                await this.sender.sendText(sender, "An error occurred during payment. Please try again later.");
+                order.status = "payment_failed";
+            }
+        } else if (userState.paymentMethod === "cash") {
+            order.status = "pending_cash";
+            await this.sender.sendText(sender, "Your order will be processed upon confirmation of cash payment on delivery/pickup.");
+        } else if (userState.paymentMethod === "credit_card") {
+            // In a real scenario, you would redirect to a payment gateway here
+            await this.sender.sendText(sender, "Credit card payment processing is not implemented in this demo.");
+            order.status = "pending_credit_card";
+        }
             
             // Save order to Redis
             await this.redisClient.set(

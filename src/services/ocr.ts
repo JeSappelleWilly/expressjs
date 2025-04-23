@@ -1,55 +1,39 @@
+import fetch from 'node-fetch';
 import FormData from 'form-data';
-import fs from 'fs';
-import path from 'path';
 
 export async function extractDataWithOmniAI(fileUrl: string, templateId: string): Promise<any | null> {
     try {
         const apiKey = process.env.OMNI_AI_API_KEY;
-        if (!apiKey) {
-            console.error("OMNI_AI_API_KEY environment variable not set.");
-            return null;
-        }
+        if (!apiKey) return null;
 
         const formData = new FormData();
-
-        // Determine if the fileUrl is a URL or a local path
-        if (fileUrl.startsWith('http') || fileUrl.startsWith('https')) {
-            // For URLs, just pass the URL
+        
+        if (fileUrl.startsWith('http')) {
             formData.append('url', fileUrl);
         } else {
-            // For local files
+            const fs = require('fs');
+            const path = require('path');
             const filePath = path.resolve(fileUrl);
-            if (!fs.existsSync(filePath)) {
-                console.error(`File not found at: ${filePath}`);
-                return null;
-            }
-            
-            // Create a read stream from the file and append it to form data
-            const fileStream = fs.createReadStream(filePath);
-            formData.append('file', fileStream, path.basename(filePath));
+            if (!fs.existsSync(filePath)) return null;
+            formData.append('file', fs.createReadStream(filePath), path.basename(filePath));
         }
-
+        
         formData.append('templateId', templateId);
 
+        // This is the key fix - cast formData as any
         const response = await fetch('https://api.getomni.ai/extract', {
             method: 'POST',
             headers: {
                 'x-api-key': apiKey,
-                ...formData.getHeaders() // This works with the form-data package
+                ...formData.getHeaders()
             },
-            body: formData
+            body: formData as any // Type assertion to bypass type checking
         });
 
-        if (!response.ok) {
-            console.error(`Omni AI API error: ${response.status} ${response.statusText}`);
-            return null;
-        }
-
-        const data = await response.json();
-        console.log("Omni AI OCR Result:", data);
-        return data;
+        if (!response.ok) return null;
+        return await response.json();
     } catch (error) {
-        console.error("Error during Omni AI OCR request:", error);
+        console.error("Error:", error);
         return null;
     }
 }

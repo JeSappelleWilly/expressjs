@@ -354,7 +354,6 @@ export class CheckoutService {
             );
         }
     }
-    
     /**
      * Processes the selected payment method
      */
@@ -493,15 +492,15 @@ export class CheckoutService {
         try {
             // Get user state
             const userState = await this.userStateService.getUserState(sender);
-            
+    
             // Get user's cart
             const cart = await this.cartService.getCart(sender);
-            
+    
             // Generate unique order ID
             const orderId = this.generateOrderId();
-            
-            // Create order object
-            const order = {
+    
+            // Create a temporary order object with a pending_payment_confirmation status
+            const tempOrder = {
                 id: orderId,
                 userId: sender,
                 items: cart.items,
@@ -511,60 +510,41 @@ export class CheckoutService {
                 discounts: cart.discounts || [],
                 deliveryType: userState.deliveryType || "pickup",
                 deliveryAddress: userState.deliveryAddress || null,
-                paymentMethod: userState.paymentMethod || "cash",
-                status: "pending",
+                paymentMethod: "mobile_payment_ocr", // Indicate the payment method
+                status: "pending_payment_confirmation",
                 createdAt: Date.now(),
                 estimatedDeliveryTime: this.calculateEstimatedDelivery(userState.deliveryType || "pickup")
             };
     
-
-  
-            // Save order to Redis
+            // Save the temporary order to Redis
             await this.redisClient.set(
                 this.getOrderKey(orderId),
-                JSON.stringify(order),
+                JSON.stringify(tempOrder),
                 "EX",
                 this.expiryTime
             );
-            
-            // Send confirmation message
+    
+            // Request the payment confirmation picture from the user
             await this.sender.sendText(
                 sender,
-                `✅ *Commande confirmée!*\n\nVotre commande n°${orderId} a été reçue et est en cours de traitement.\n\n${
-                    order.deliveryType === "delivery" 
-                        ? `Heure estimée: ${this.formatEstimatedTime(order.estimatedDeliveryTime)}`
-                        : `Votre commande sera prête dans environ ${Math.floor((order.estimatedDeliveryTime - Date.now()) / 60000)} minutes.`
-                }\n\nMerci pour votre commande!`
+                "Veuillez envoyer une photo de la confirmation de votre paiement mobile pour que nous puissions traiter votre commande."
             );
-            
-            // Clear the cart
-            await this.cartService.clearCart(sender);
-            
-            // Reset user state to browsing
-            await this.userStateService.resetState(sender);
-            
-            // Send return to menu button
-            await this.sender.sendReplyButtons(sender,"Nouvelle commande ou vérifiez votre statut.", 
-                {
-                    "main-menu": "Menu principal",
-                    "my-orders": "Mes commandes",
-                },
-                    {
-                        header: {
-                            type: "text",
-                            text: "Que faire ensuite?"
-                        }
-                    })        
-            
+    
+            // Update user state to indicate they need to send the payment confirmation
+            await this.userStateService.updateUserState(sender, {
+                step: "waiting_for_payment_confirmation",
+                currentOrderId: orderId // Store the order ID for the next step
+            });
+    
         } catch (error) {
-            console.error(`Error confirming final order for user ${sender}:`, error);
+            console.error(`Error requesting payment confirmation for user ${sender}:`, error);
             await this.sender.sendText(
                 sender,
-                "Erreur de traitement. Veuillez réessayer."
+                "Erreur lors de la demande de confirmation de paiement. Veuillez réessayer."
             );
         }
     }
-    
+  
     /**
      * Calculates estimated delivery time
      */
@@ -627,6 +607,167 @@ export class CheckoutService {
                 sender,
                 "Erreur d'annulation. Veuillez réessayer."
             );
+        }
+    }
+
+    async requestPaymentConfirmationPicture(sender: string): Promise<void> {
+        try {
+            // Get user's cart
+            const cart = await this.cartService.getCart(sender);
+            const userState = await this.userStateService.getUserState(sender); // Get the user state
+
+            // Generate unique order ID
+            const orderId = this.generateOrderId();
+
+            // Create a temporary order in Redis
+            const tempOrder = {
+                id: orderId,
+                userId: sender,
+                items: cart.items,
+                subtotal: cart.subtotal,
+                tax: cart.tax,
+                total: cart.total,
+                discounts: cart.discounts || [],
+                deliveryType: userState.deliveryType || "pickup", // Use userState.deliveryType
+                deliveryAddress: userState.deliveryAddress || null, // Use userState.deliveryAddress
+                paymentMethod: "mobile_payment_ocr",
+                status: "pending_payment_confirmation",
+                createdAt: Date.now(),
+                estimatedDeliveryTime: this.calculateEstimatedDelivery(userState.deliveryType || "pickup") // Use userState.deliveryType
+            };
+
+            await this.redisClient.set(
+                this.getOrderKey(orderId),
+                JSON.stringify(tempOrder),
+                "EX",
+                this.expiryTime
+            );
+
+            // Request the payment confirmation picture
+            await this.sender.sendText(
+                sender,
+                "Veuillez envoyer une photo de la confirmation de votre paiement mobile pour que nous puissions traiter votre commande."
+            );
+
+            // Update user state
+            await this.userStateService.updateUserState(sender, {
+                step: "waiting_for_payment_confirmation",
+                currentOrderId: orderId
+            });
+
+        } catch (error) {
+            console.error(`Error requesting payment confirmation from ${sender}:`, error);
+            await this.sender.sendText(sender, "Erreur lors de la demande de confirmation de paiement.");
+        }
+    }
+
+    async processPaymentConfirmationPicture(sender: string, imageUrl: string): Promise<void> {
+        try {
+            const userState = await this.userStateService.getUserState(sender);
+            const orderId = userState.currentOrderId;
+            const templateId = "your-payment-confirmation-template-id"; // Replace with your actual template ID
+
+            if (!orderId) {
+                console.error(`No order ID found in user state for ${sender}.`);
+                await this.sender.sendText(sender, "Impossible de trouver la commande associée. Veuillez réessayer.");
+                return;
+            }
+
+            await this.sender.sendText(sender, "Traitement de la confirmation de paiement...");
+            const extractedData = await extractDataWithOmniAI(imageUrl, templateId);
+
+            if (extractedData) {
+                console.log("Extracted Payment Confirmation Data:", extractedData);
+
+                // Update the order status in Redis to indicate payment confirmed
+                const orderKey = this.getOrderKey(orderId);
+                const orderData = await this.redisClient.get(orderKey);
+                if (orderData) {
+                    const order = JSON.parse(orderData);
+                    order.status = "payment_confirmed";
+                    await this.redisClient.set(orderKey, JSON.stringify(order), "EX", this.expiryTime);
+
+                    await this.sender.sendText(sender, "Confirmation de paiement reçue et validée. Votre commande est en cours de traitement.");
+
+                    // Proceed with the final order confirmation and potentially send a summary
+                    await this.sendFinalOrderConfirmation(sender, orderId); // New function
+                } else {
+                    console.error(`Order data not found in Redis for order ID: ${orderId}`);
+                    await this.sender.sendText(sender, "Erreur lors de la mise à jour de la commande. Veuillez réessayer.");
+                }
+
+                // Reset user state (optional, depending on your flow)
+                await this.userStateService.resetState(sender);
+
+            } else {
+                await this.sender.sendText(sender, "La confirmation de paiement n'a pas pu être validée. Veuillez réessayer d'envoyer la photo ou contactez le support.");
+
+                // Optionally update the order status to payment_failed
+                const orderKey = this.getOrderKey(orderId);
+                const orderData = await this.redisClient.get(orderKey);
+                if (orderData) {
+                    const order = JSON.parse(orderData);
+                    order.status = "payment_failed";
+                    await this.redisClient.set(orderKey, JSON.stringify(order), "EX", this.expiryTime);
+                }
+            }
+
+        } catch (error) {
+            console.error(`Error processing payment confirmation picture for ${sender}:`, error);
+            await this.sender.sendText(
+                sender,
+                "Erreur lors du traitement de la confirmation de paiement. Veuillez réessayer."
+            );
+        }
+    }
+
+    async sendFinalOrderConfirmation(sender: string, orderId: string): Promise<void> {
+        try {
+            const orderKey = this.getOrderKey(orderId);
+            const orderData = await this.redisClient.get(orderKey);
+
+            if (orderData) {
+                const order = JSON.parse(orderData);
+
+                let confirmationMessage = `✅ *Commande confirmée!* (Paiement validé par image)\n\nVotre commande n°${order.id} a été reçue et est en cours de traitement.\n\n`;
+                order.items.forEach((item:any, index:any) => {
+                    confirmationMessage += `${index + 1}. ${item.name} x${item.quantity} - ${(item.price * item.quantity).toFixed(2)}€\n`;
+                });
+                confirmationMessage += `\nTotal: ${order.total.toFixed(2)}€\n`;
+                if (order.deliveryType === "delivery") {
+                    confirmationMessage += `Adresse de livraison: ${order.deliveryAddress}\n`;
+                    confirmationMessage += `Heure estimée: ${this.formatEstimatedTime(order.estimatedDeliveryTime)}\n`;
+                } else {
+                    confirmationMessage += `Retrait en magasin. Prêt vers ${this.formatEstimatedTime(order.estimatedDeliveryTime)}\n`;
+                }
+
+                await this.sender.sendText(sender, confirmationMessage);
+
+                // Clear the cart
+                await this.cartService.clearCart(sender);
+
+                // Reset user state to browsing
+                await this.userStateService.resetState(sender);
+
+                // Send return to menu button
+                await this.sender.sendReplyButtons(sender,"Nouvelle commande ou vérifiez votre statut.",
+                    {
+                        "main-menu": "Menu principal",
+                        "my-orders": "Mes commandes",
+                    },
+                    {
+                        header: {
+                            type: "text",
+                            text: "Que faire ensuite?"
+                        }
+                    })
+            } else {
+                console.error(`Order data not found in Redis for order ID: ${orderId}`);
+                await this.sender.sendText(sender, "Erreur lors de l'envoi de la confirmation de commande.");
+            }
+        } catch (error) {
+            console.error(`Error sending final order confirmation for ${sender}:`, error);
+            await this.sender.sendText(sender, "Erreur lors de l'envoi de la confirmation finale.");
         }
     }
 }

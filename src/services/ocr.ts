@@ -2,7 +2,7 @@ import FormData from 'form-data';
 import fs from 'fs';
 import path from 'path';
 
-async function extractDataWithOmniAI(fileUrl: string, templateId: string): Promise<any | null> {
+export async function extractDataWithOmniAI(fileUrl: string, templateId: string): Promise<any | null> {
     try {
         const apiKey = process.env.OMNI_AI_API_KEY;
         if (!apiKey) {
@@ -14,15 +14,19 @@ async function extractDataWithOmniAI(fileUrl: string, templateId: string): Promi
 
         // Determine if the fileUrl is a URL or a local path
         if (fileUrl.startsWith('http') || fileUrl.startsWith('https')) {
+            // For URLs, just pass the URL
             formData.append('url', fileUrl);
         } else {
-            // Assume it's a local path
-            const filePath = path.resolve(fileUrl); // Ensure absolute path
+            // For local files
+            const filePath = path.resolve(fileUrl);
             if (!fs.existsSync(filePath)) {
                 console.error(`File not found at: ${filePath}`);
                 return null;
             }
-            formData.append('url', fs.createReadStream(filePath), path.basename(filePath));
+            
+            // Create a read stream from the file and append it to form data
+            const fileStream = fs.createReadStream(filePath);
+            formData.append('file', fileStream, path.basename(filePath));
         }
 
         formData.append('templateId', templateId);
@@ -31,20 +35,19 @@ async function extractDataWithOmniAI(fileUrl: string, templateId: string): Promi
             method: 'POST',
             headers: {
                 'x-api-key': apiKey,
-                ...formData.getHeaders(),
+                ...formData.getHeaders() // This works with the form-data package
             },
-            body: formData,
+            body: formData
         });
 
-        const data = await response.json();
-
-        if (response.ok && data) {
-            console.log("Omni AI OCR Result:", data);
-            return data;
-        } else {
-            console.error("Omni AI OCR API Error:", response.status, data);
+        if (!response.ok) {
+            console.error(`Omni AI API error: ${response.status} ${response.statusText}`);
             return null;
         }
+
+        const data = await response.json();
+        console.log("Omni AI OCR Result:", data);
+        return data;
     } catch (error) {
         console.error("Error during Omni AI OCR request:", error);
         return null;

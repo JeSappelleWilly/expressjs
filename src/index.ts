@@ -73,6 +73,8 @@ async function onNewMessage(message: Message) {
         await cartService.addItemToCart(recipient, selectedId);
         await cartService.sendCartSummary(recipient);
       }
+    }  else if (message.type === 'image') {
+      console.warn("got receipt image")
     } else if (message.type === 'button_reply') {
       const buttonId = message.data.id;
       

@@ -525,7 +525,7 @@ export class CheckoutService {
         const orderIdentifier = orderId;
         const customerEmail = `${sender}@example.com`;
         const paymentReason = "Payment for order"; // Or something more specific
-        const returnURL = process.env.RAILWAY_PUBLIC_DOMAIN!;
+        const returnURL = `https://${process.env.RAILWAY_PUBLIC_DOMAIN!}/`;
 
         if (userState.paymentMethod === "mobile_payment") {
             await this.sender.sendText(sender, "Redirecting to mobile payment...");

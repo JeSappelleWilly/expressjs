@@ -700,7 +700,10 @@ export class CheckoutService {
                 await this.userStateService.resetState(sender);
 
             } else {
-                await this.sender.sendText(sender, "La confirmation de paiement n'a pas pu être validée. Veuillez réessayer d'envoyer la photo ou contactez le support.");
+                await this.sender.sendReplyButtons(sender, "La confirmation de paiement n'a pas pu être validée. Veuillez réessayer d'envoyer la photo ou contactez le support.", {
+                    "help": "Besoin d'assistance",
+                    "menu": "Menu"
+                });
 
                 // Optionally update the order status to payment_failed
                 const orderKey = this.getOrderKey(orderId);

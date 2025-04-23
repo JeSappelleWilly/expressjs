@@ -154,6 +154,5 @@ export class UserStateService {
       console.error(`Error deleting state for user ${userId}:`, error);
       return false;
     }
-  }
-  
+  } 
 }

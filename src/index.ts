@@ -74,7 +74,12 @@ async function onNewMessage(message: Message) {
         await cartService.sendCartSummary(recipient);
       }
     }  else if (message.type === 'image') {
-      console.warn("got receipt image")
+      console.warn("got receipt image");
+      if (userState?.step === "waiting_for_payment_confirmation") {
+          await checkoutService.processPaymentConfirmationPicture(recipient, message.data.url);
+      } else {
+          await sender.sendText(recipient, "Merci pour l'image."); // Handle other image uploads if needed
+      }
     } else if (message.type === 'button_reply') {
       const buttonId = message.data.id;
       

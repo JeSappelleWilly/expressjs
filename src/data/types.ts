@@ -216,8 +216,6 @@ export interface Order {
     };
   }
 
-  // ../data/types.ts
-
 export type OrderFlow = "browsing" | "checkout" | "order_placed";
 
 export type OrderStep =
@@ -225,6 +223,7 @@ export type OrderStep =
   | "category"
   | "item_list"
   | "location_input"
+  | "waiting_for_payment_confirmation"
   | "specials"
   | "selecting_delivery_type"
   | "selecting_payment"
@@ -240,6 +239,7 @@ export interface UserState {
   deliveryAddress: string | null;
   deliveryType: "pickup" | "delivery" | null;
   lastInteractionAt: number;
+  currentOrderId?: string | null; // To store the current order ID
   hasDeliveryAddress?: boolean;
   locationCoordinates?: {
     longitude: number

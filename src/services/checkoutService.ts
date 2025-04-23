@@ -521,9 +521,9 @@ export class CheckoutService {
         const depositId = orderId; // Using order ID as deposit ID
         const amount = cart.total.toFixed(2);
         const statementDescription = `Order ${orderId}`;
-        const payerMsisdn = userState.phoneNumber; // Ensure you have this
+        const payerMsisdn = sender; // Ensure you have this
         const orderIdentifier = orderId;
-        const customerEmail = userState.email || `${sender}@example.com`;
+        const customerEmail = `${sender}@example.com`;
         const paymentReason = "Payment for order"; // Or something more specific
         const returnURL = process.env.RAILWAY_PUBLIC_DOMAIN;
 

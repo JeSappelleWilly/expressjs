@@ -1,7 +1,7 @@
 // services/checkoutService.ts
 import { CartService } from "./cartService";
 import { UserStateService } from "./userStateService";
-import { initiatePawaPayWidgetSession } from "./pay";
+import { extractDataWithOmniAI } from "./ocr";
 import Redis from "ioredis";
 import { MessageSender } from "../types/bot";
 
